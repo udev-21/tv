@@ -32,6 +32,7 @@ class UserResource extends Resource
             Image::make('Avatar'),
             Text::make('Ishni raqami', 'employee_id')->required(),
             Text::make('Name')->required(),
+            Text::make('Latin Name')->required(),
             Text::make('Phone'),
         ];
 	}

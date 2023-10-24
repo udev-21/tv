@@ -53,6 +53,4 @@ Route::get('/left-new', function () {
 });
 
 
-Route::middleware(['client-ip'])->any('/webhook/process', function () {
-    return ['message' => 'Hello World!'];
-});
+Route::middleware(['client-ip'])->any('/webhook/process', [\App\Http\Controllers\CameraController::class, 'index']);

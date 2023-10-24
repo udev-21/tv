@@ -24,6 +24,7 @@ class User extends Authenticatable
         'avatar',
         'active',
         'employee_id',
+        'latin_name',
     ];
 
     /**
