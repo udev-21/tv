@@ -37,7 +37,7 @@
                             Position
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Action
+                            Last action
                         </th>
                     </tr>
                 </thead>
@@ -68,7 +68,7 @@
                             React Developer
                         </td>
                         <td class="px-6 py-4">
-                            <user-detail :user="user"></user-detail>
+                            {{ user.ago }}
                         </td>
                     </tr>
                 </template>    
@@ -83,7 +83,7 @@
 <script>
     import Echo from 'laravel-echo';
     import Pusher from 'pusher-js';
-
+    import moment from 'moment';
     export default {
         name: "users-list",
         data: () => ({
@@ -132,13 +132,37 @@
                     return a.updated_at < b.updated_at;
                 });
             },
+
+            timeAgo(date) {
+                if (typeof date == 'string') {
+                    date = Date.parse(date);
+                }                
+                const days = moment.duration(new Date() - date).days();
+                const hours = moment.duration(new Date() - date).hours();
+                const minutes = moment.duration(new Date() - date).minutes();
+                const seconds = moment.duration(new Date() - date).seconds();
+
+                return `${(days ? days+' кун' : '')}  ${(hours && (days < 1) ? hours+'соат' : '')}  ${(minutes && (hours < 2) ? minutes + ' дакика' : '')}  ${(minutes < 2 ? seconds+'сония' : '')} `;
+            }
+        },
+
+        created() {
+            console.log(moment.locale('uz'));
+            
+            setInterval(() => {
+                this.users = this.users.map(m => {
+                    m.ago = this.timeAgo(m.updated_at);
+                    return m;
+                })
+            }, 1000)
+
         },
         mounted() {
             axios.get('/api/users')
                 .then(response => {
-                    // this.users = ;
-                    this.users = response.data.map(function(user) {
+                    this.users = response.data.map((user) => {
                         user.imagePreview = false;
+                        user.ago = this.timeAgo(user.updated_at);
                         return user;
                     });
                     this.allUsers = [...this.users];
@@ -175,6 +199,7 @@
                             console.log('user exists', userExists);
                             userExists.active = true;
                             userExists.updated_at = e.user.updated_at;
+                            userExists.ago = this.timeAgo(e.user.updated_at);
                             this.sort();
                         }else {
                             console.log('user does not exist', userExists);
@@ -197,6 +222,7 @@
                             console.log('user exists', userExists);
                             userExists.active = false;
                             userExists.updated_at = e.user.updated_at;
+                            userExists.ago = this.timeAgo(e.user.updated_at);
                             this.sort();
                         }else {
                             console.log('user does not exist', userExists);
