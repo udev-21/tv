@@ -142,7 +142,15 @@
                 const minutes = moment.duration(new Date() - date).minutes();
                 const seconds = moment.duration(new Date() - date).seconds();
 
-                return `${(days ? days+' кун' : '')}  ${(hours && (days < 1) ? hours+'соат' : '')}  ${(minutes && (hours < 2) ? minutes + ' дакика' : '')}  ${(minutes < 2 ? seconds+'сония' : '')} `;
+                if (days >= 1) {
+                    return days + ' кун';
+                }else if (hours >= 1 && days < 1) {
+                    return hours + ' соат';
+                }else if (minutes >= 1 && hours < 1) {
+                    return minutes + ' дакика';
+                }else {
+                    return seconds + ' сония';
+                }
             }
         },
 
