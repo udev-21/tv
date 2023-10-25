@@ -67,7 +67,10 @@ class CameraController extends Controller
                         ], 200);
                     }else {
                         Log::error("Camera with ip $ip is not configured properly");
-                        return;
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => "Camera with ip $ip is not configured properly",
+                        ], 400);
                     }
                 }
             }
