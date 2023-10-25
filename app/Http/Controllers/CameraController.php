@@ -73,7 +73,18 @@ class CameraController extends Controller
                         ], 400);
                     }
                 }
+            }else {
+                // Log::error("Camera ip is not found in request");
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Camera ip is not found in request',
+                ], 200);
             }
+        }else {
+            return response()->json([
+                'status' => 'info',
+                'message' => 'event_log is not found in request',
+            ], 200);
         }
     }
 }

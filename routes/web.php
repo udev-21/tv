@@ -53,4 +53,4 @@ Route::get('/left-new', function () {
 });
 
 
-Route::middleware(['client-ip'])->any('/webhook/process', [\App\Http\Controllers\CameraController::class, 'index']);
+Route::any('/webhook/process', [\App\Http\Controllers\CameraController::class, 'index']);
