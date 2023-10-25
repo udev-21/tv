@@ -23,7 +23,7 @@ class EmployeeLeftBuilding implements ShouldBroadcast
         public User $user,
     )
     {
-        Log::info("User with employee id {$user->emploee_id} left the building");
+        // Log::info("User with employee id {$user->emploee_id} left the building");
     }
 
     /**

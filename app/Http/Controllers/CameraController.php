@@ -13,13 +13,13 @@ class CameraController extends Controller
 {
     public function index(Request $request)
     {
-        Log::info("Camera event received", []);
-        Log::info('event_log', ['event_log'=> $request->input('event_log')]);
+        // Log::info("Camera event received", []);
+        // Log::info('event_log', ['event_log'=> $request->input('event_log')]);
         if($request->has('event_log')) {
             $event = $request->input('event_log');
             $event = @json_decode(stripslashes(preg_replace("#(\\\\n|\\\\t)#", "", $event)), true);
             if ($event === null) {
-                Log::error("Camera event is not valid json");
+                // Log::error("Camera event is not valid json");
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Camera event is not valid json',
@@ -32,7 +32,7 @@ class CameraController extends Controller
                 if (array_key_exists($ip, $whitelist)) {
                     // make sure if event user is entrance or user exit
                     if (($event["AccessControllerEvent"]["employeeNoString"] ?? "") === "" || ($event["AccessControllerEvent"]["name"] ?? "") === "") {
-                        Log::info("no employee id or name found");
+                        // Log::info("no employee id or name found");
                         return response()->json([
                             'status' => 'success',
                             'message' => "no employee id or name found",
@@ -68,14 +68,14 @@ class CameraController extends Controller
                             'message' => "User $name with employee id $employee_id left the building",
                         ], 200);
                     }else {
-                        Log::error("Camera with ip $ip is not configured properly");
+                        // Log::error("Camera with ip $ip is not configured properly");
                         return response()->json([
                             'status' => 'error',
                             'message' => "Camera with ip $ip is not configured properly",
                         ], 400);
                     }
                 }else {
-                    Log::error("Camera with ip $ip is not whitelisted");
+                    // Log::error("Camera with ip $ip is not whitelisted");
                     return response()->json([
                         'status' => 'error',
                         'message' => "Camera with ip $ip is not whitelisted",
