@@ -13,7 +13,8 @@ class CameraController extends Controller
 {
     public function index(Request $request)
     {
-        // Log::info("Camera event received", []);
+        try{
+// Log::info("Camera event received", []);
         // Log::info('event_log', ['event_log'=> $request->input('event_log')]);
         if($request->has('event_log')) {
             $event = $request->input('event_log');
@@ -94,5 +95,13 @@ class CameraController extends Controller
                 'message' => 'event_log is not found in request',
             ], 200);
         }
+        }catch(\Throwable $e) {
+            // Log::error($e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+        
     }
 }
