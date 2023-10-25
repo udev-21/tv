@@ -13,8 +13,8 @@ class CameraController extends Controller
 {
     public function index(Request $request)
     {
-        Log::info("Camera event received");
-        Log::info('event_log', $request->input('event_log'));
+        Log::info("Camera event received", []);
+        Log::info('event_log', ['event_log'=> $request->input('event_log')]);
         if($request->has('event_log')) {
             $event = $request->input('event_log');
             $event = @json_decode(stripslashes(preg_replace("#(\\\\n|\\\\t)#", "", $event)), true);
