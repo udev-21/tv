@@ -13,9 +13,11 @@ class CameraController extends Controller
 {
     public function index(Request $request)
     {
+        Log::info("Camera event received");
+        Log::info('event_log', $request->input('event_log'));
         if($request->has('event_log')) {
             $event = $request->input('event_log');
-            $event = json_decode(stripslashes(preg_replace("#(\\\\n|\\\\t)#", "", $event)), true);
+            $event = @json_decode(stripslashes(preg_replace("#(\\\\n|\\\\t)#", "", $event)), true);
             if ($event === null) {
                 Log::error("Camera event is not valid json");
                 return response()->json([
@@ -72,6 +74,12 @@ class CameraController extends Controller
                             'message' => "Camera with ip $ip is not configured properly",
                         ], 400);
                     }
+                }else {
+                    Log::error("Camera with ip $ip is not whitelisted");
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Camera with ip $ip is not whitelisted",
+                    ], 400);
                 }
             }else {
                 // Log::error("Camera ip is not found in request");
