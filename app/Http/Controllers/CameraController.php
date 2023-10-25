@@ -18,7 +18,11 @@ class CameraController extends Controller
             $event = json_decode(stripslashes(preg_replace("#(\\\\n|\\\\t)#", "", $event)), true);
             if ($event === null) {
                 Log::error("Camera event is not valid json");
-                return;
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Camera event is not valid json',
+                    'event_log' => $request->input('event_log'),
+                ], 400);
             }
             if (array_key_exists('ipAddress', $event)){
                 $ip = $event['ipAddress'];
@@ -26,7 +30,11 @@ class CameraController extends Controller
                 if (array_key_exists($ip, $whitelist)) {
                     // make sure if event user is entrance or user exit
                     if (($event["AccessControllerEvent"]["employeeNoString"] ?? "") === "" || ($event["AccessControllerEvent"]["name"] ?? "") === "") {
-                        return;
+                        Log::info("no employee id or name found");
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => "no employee id or name found",
+                        ], 200);
                     }
                     $employee_id = $event["AccessControllerEvent"]["employeeNoString"];
                     $name = $event["AccessControllerEvent"]["name"];
@@ -44,10 +52,19 @@ class CameraController extends Controller
                         $user->active = true;
                         $user->save();
                         EmployeeEnteredBuilding::dispatch($user);
+
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => "User $name with employee id $employee_id entered the building",
+                        ], 200);
                     }else if ($camera['exit']) {
                         $user->active = false;
                         $user->save();
                         EmployeeLeftBuilding::dispatch($user);
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => "User $name with employee id $employee_id left the building",
+                        ], 200);
                     }else {
                         Log::error("Camera with ip $ip is not configured properly");
                         return;

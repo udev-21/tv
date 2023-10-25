@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeEnteredBuilding implements ShouldBroadcast
 {
@@ -22,7 +23,7 @@ class EmployeeEnteredBuilding implements ShouldBroadcast
         public User $user,
     )
     {
-        //
+        Log::info("User with employee id {$user->emploee_id} entered the building");
     }
 
     /**

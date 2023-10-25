@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 
 class EmployeeLeftBuilding implements ShouldBroadcast
@@ -22,7 +23,7 @@ class EmployeeLeftBuilding implements ShouldBroadcast
         public User $user,
     )
     {
-        //
+        Log::info("User with employee id {$user->emploee_id} left the building");
     }
 
     /**
