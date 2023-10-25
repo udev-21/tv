@@ -31,6 +31,7 @@ class UserResource extends Resource
 		    ID::make()->sortable(),
             Image::make('Avatar'),
             Text::make('Ishni raqami', 'employee_id')->required(),
+            Text::make('Lavozimi', 'position'),
             Text::make('Name')->required(),
             Text::make('Latin Name')->required(),
             Text::make('Phone'),

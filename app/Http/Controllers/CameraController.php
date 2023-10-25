@@ -55,7 +55,6 @@ class CameraController extends Controller
                         $user->active = true;
                         $user->save();
                         EmployeeEnteredBuilding::dispatch($user);
-
                         return response()->json([
                             'status' => 'success',
                             'message' => "User $name with employee id $employee_id entered the building",

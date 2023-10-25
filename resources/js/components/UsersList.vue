@@ -5,15 +5,15 @@
                     <div class="flex select-none">
                         <div class="flex items-center mr-4">
                             <input @click="showOnlyOnline" id="inline-radio" type="radio" value="" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="inline-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Online</label>
+                            <label for="inline-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Binoda</label>
                         </div>
                         <div class="flex items-center mr-4">
                             <input @click="showOnlyOffline" id="inline-2-radio" type="radio" value="" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="inline-2-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Offline</label>
+                            <label for="inline-2-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Binodan tashqarida</label>
                         </div>
                         <div class="flex items-center mr-4">
                             <input @click="showAll" checked id="inline-checked-radio" type="radio" value="" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="inline-checked-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Both</label>
+                            <label for="inline-checked-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Hammasi</label>
                         </div>
                     </div>
                 </div>
@@ -31,10 +31,13 @@
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3">
-                            Name
+                            FIO
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Position
+                            Lavozimi
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Tel raqami
                         </th>
                         <th scope="col" class="px-6 py-3">
                             Last action
@@ -65,7 +68,10 @@
                             </div>
                         </th>
                         <td class="px-6 py-4">
-                            React Developer
+                            {{ user.position ? user.position : 'mavjud emas' }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ user.phone ? user.phone : 'mavjud emas' }}
                         </td>
                         <td class="px-6 py-4">
                             {{ user.ago }}
