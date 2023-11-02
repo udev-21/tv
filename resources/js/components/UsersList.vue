@@ -27,7 +27,7 @@
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                         </svg>
                     </div>
-                    <input v-model="search" type="text" id="table-search-users" class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for users">
+                    <input v-model="search" @change="onChangeSearch" type="text" id="table-search-users" class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for users">
                 </div>
             </div>
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -51,15 +51,14 @@
                         <th scope="col" class="px-6 py-3">
                             Ketgan vaqti 
                         </th>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'updated_at' ? 'updated_at desc': 'updated_at')">
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'updated_at' ? 'updated_at desc': 'updated_at'); sort();">
                             Last action {{ this.sortBy == 'updated_at' ? '▲' : (this.sortBy == 'updated_at desc' ? '▲' : '') }}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="user in filteredUsers" :key="user.id">
-                        
-                        <tr v-show="lastState=='showAll' || (user.active &&  lastState=='showOnlyOnline' ) || (!user.active && lastState=='showOnlyOffline')" :class="`border-b ${(user.active == true) ? 'bg-green-200 hover:bg-green-300' : 'bg-red-200 hover:bg-red-300'}`" >
+                    <template v-for="user in users" :key="user.id">
+                        <tr :class="`border-b ${(user.active == true) ? 'bg-green-200 hover:bg-green-300' : 'bg-red-200 hover:bg-red-300'}`" >
                             <th scope="row" class="flex items-center px-2 py-2 text-gray-900 whitespace-nowrap dark:text-white">
                             <div>
                                 <img @click="imagePreview=true; user.imagePreview=true" class="w-7 h-7 rounded-full hover:opacity-75 hover:border-2" :src="avatarLink(user.avatar)" alt="img">
@@ -123,12 +122,6 @@
             sortBy: 'updated_at',
         }),
         computed: {
-            filteredUsers() {
-                return this.users.filter(user => {
-                    return user.name.toLowerCase().includes(this.search.toLowerCase()) || user.position?.toLowerCase().includes(this.search.toLowerCase()) || user.phone?.toLowerCase().includes(this.search.toLowerCase());
-                });
-            },
-
             usersCount() {
                 return (lastState, search) => {
                     let users = [...this.users];
@@ -163,16 +156,19 @@
             },
             showOnlyOnline() {
                 this.lastState = 'showOnlyOnline';
+                this.users = this.allUsers.filter(user => user.active);
                 this.sort();
             },
 
             showOnlyOffline() {
                 this.lastState = 'showOnlyOffline';
+                this.users = this.allUsers.filter(user => !user.active);
                 this.sort();
             },
 
             showAll() {
                 this.lastState = 'showAll';
+                this.users = [...this.allUsers];
                 this.sort();
             },
             sort(){
@@ -189,9 +185,9 @@
                     }else if (this.sortBy == 'position desc') {
                         return a.position > b.position;
                     }else if (this.sortBy == 'in_building_time') {
-                        return a.in_building_seconds ?? 0 < b.in_building_seconds ?? 0;
+                        return a.in_building_seconds > b.in_building_seconds ;
                     }else if (this.sortBy == 'in_building_time desc') {
-                        return a.in_building_seconds ?? 0 > b.in_building_seconds ?? 0;
+                        return a.in_building_seconds < b.in_building_seconds ;
                     }else if (this.sortBy == 'phone') {
                         return a.phone < b.phone;
                     }else if (this.sortBy == 'phone desc') {
@@ -200,8 +196,8 @@
                     
                     return a.updated_at < b.updated_at;
                 });
+                console.log(this.users);
             },
-
             timeAgo(date) {
                 if (typeof date == 'string') {
                     date = Date.parse(date);
@@ -220,6 +216,17 @@
                 }else {
                     return seconds + ' сония';
                 }
+            },
+             
+            onChangeSearch() {
+                if (this.search) {
+                    this.users = this.allUsers.filter(user => {
+                        return user.name.toLowerCase().includes(this.search.toLowerCase());
+                    });
+                }else {
+                    this.users = [...this.allUsers];
+                }
+                this.sort();
             }
         },
 
@@ -234,12 +241,16 @@
 
                         m.in_building_seconds = _seconds + parseInt(m.in_building_time);
 
+                        const days = moment.duration(m.in_building_seconds).days();
                         const hours = moment.duration(m.in_building_seconds).hours();
                         const minutes = moment.duration(m.in_building_seconds).minutes();
                         const seconds = moment.duration(m.in_building_seconds).seconds();
 
                         m.in_building_time_show = ''
-                        if (hours >= 1) {
+                        if (days >= 1) {
+                            m.in_building_time_show += days + ' кун ';
+                        }
+                        if (hours >= 1 && days < 1) {
                             m.in_building_time_show += hours + ' соат ';
                         }
                         if (minutes >= 1 && hours < 5) {
@@ -261,12 +272,16 @@
                         user.imagePreview = false;
                         user.ago = this.timeAgo(user.updated_at);
 
+                        const days = moment.duration(parseInt(user.in_building_time)).days();
                         const hours = moment.duration(parseInt(user.in_building_time)).hours();
                         const minutes = moment.duration(parseInt(user.in_building_time)).minutes();
                         const seconds = moment.duration(parseInt(user.in_building_time)).seconds();
 
                         user.in_building_time_show = ''
-                        if (hours >= 1) {
+                        if (days >= 1) {
+                            user.in_building_time_show += days + ' кун ';
+                        }
+                        if (hours >= 1 && days < 1) {
                             user.in_building_time_show += hours + ' соат ';
                         }
                         if (minutes >= 1 && hours < 5) {
@@ -275,11 +290,13 @@
                         if (hours < 1 && minutes < 1) {
                             user.in_building_time_show += seconds + ' сония ';
                         }
+                        user.in_building_seconds = parseInt(user.in_building_time)
 
                         return user;
                     });
                     this.allUsers = [...this.users];
                     this.sort();
+                    console.log(this.users);
                 })
                 .catch(error => {
                     console.log(error);
