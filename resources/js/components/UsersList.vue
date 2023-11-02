@@ -232,7 +232,8 @@
                     if (m.active) {
                         let _seconds = (new Date()).getTime() - Date.parse(m.updated_at);
 
-                        m.in_building_seconds = _seconds + parseInt(m.in_building_time ?? "0");
+                        m.in_building_seconds = _seconds + parseInt(m.in_building_time);
+
                         const hours = moment.duration(m.in_building_seconds).hours();
                         const minutes = moment.duration(m.in_building_seconds).minutes();
                         const seconds = moment.duration(m.in_building_seconds).seconds();
@@ -259,6 +260,22 @@
                     this.users = response.data.map((user) => {
                         user.imagePreview = false;
                         user.ago = this.timeAgo(user.updated_at);
+
+                        const hours = moment.duration(parseInt(user.in_building_time)).hours();
+                        const minutes = moment.duration(parseInt(user.in_building_time)).minutes();
+                        const seconds = moment.duration(parseInt(user.in_building_time)).seconds();
+
+                        user.in_building_time_show = ''
+                        if (hours >= 1) {
+                            user.in_building_time_show += hours + ' соат ';
+                        }
+                        if (minutes >= 1 && hours < 5) {
+                            user.in_building_time_show += minutes + ' дакика ';
+                        }
+                        if (hours < 1 && minutes < 1) {
+                            user.in_building_time_show += seconds + ' сония ';
+                        }
+
                         return user;
                     });
                     this.allUsers = [...this.users];

@@ -41,7 +41,7 @@ Route::get('/users', function () {
                 order by created_at desc
                 limit 1
             ) as last_out,
-            (
+            ifnull((
                 select 
                     sum(
                         time_to_sec(in_building_time)
@@ -89,7 +89,7 @@ Route::get('/users', function () {
                     ) as t 
                 group by 
             user_id, 
-            date(created_at)) as in_building_time
+            date(created_at)), 0) * 1000 as in_building_time
         ")
     )->orderBy('updated_at', 'DESC');
     return response()->json($users->get());
