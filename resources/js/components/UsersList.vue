@@ -230,7 +230,6 @@
                 this.users = this.users.map(m => {
                     m.ago = this.timeAgo(m.updated_at);
                     if (m.active) {
-                        console.log((new Date()).getTime(),   Date.parse(m.updated_at));
                         let _seconds = (new Date()).getTime() - Date.parse(m.updated_at);
 
                         m.in_building_seconds = _seconds + parseInt(m.in_building_time ?? "0");
