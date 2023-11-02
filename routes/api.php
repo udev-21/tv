@@ -41,54 +41,53 @@ Route::get('/users', function () {
                 order by created_at desc
                 limit 1
             ) as last_out,
-            (select 
-            sec_to_time(
-                sum(
-                time_to_sec(in_building_time)
-                )
-            )
-            FROM 
             (
                 select 
-                * 
+                    sum(
+                        time_to_sec(in_building_time)
+                    )
                 FROM 
-                (
-                    select 
-                    id, 
-                    user_id, 
-                    created_at, 
-                    next_created_at, 
-                    next_type, 
-                    type, 
-                    timediff(next_created_at, created_at) as in_building_time 
-                    FROM 
                     (
                         select 
-                        *, 
-                        lead(created_at, 1) over(
-                            partition by user_id, 
-                            date(created_at) 
-                            order by 
-                            created_at
-                        ) as next_created_at, 
-                        lead(type, 1) over(
-                            partition by user_id, 
-                            date(created_at) 
-                            order by 
-                            created_at
-                        ) as next_type 
+                        * 
                         FROM 
-                        user_logs 
-                        where 
-                        user_id = users.id
-                        and date(user_logs.created_at) = date(now())
+                        (
+                            select 
+                            id, 
+                            user_id, 
+                            created_at, 
+                            next_created_at, 
+                            next_type, 
+                            type, 
+                            timediff(next_created_at, created_at) as in_building_time 
+                            FROM 
+                            (
+                                select 
+                                *, 
+                                lead(created_at, 1) over(
+                                    partition by user_id, 
+                                    date(created_at) 
+                                    order by 
+                                    created_at
+                                ) as next_created_at, 
+                                lead(type, 1) over(
+                                    partition by user_id, 
+                                    date(created_at) 
+                                    order by 
+                                    created_at
+                                ) as next_type 
+                                FROM 
+                                user_logs 
+                                where 
+                                user_id = users.id
+                                and date(user_logs.created_at) = date(now())
+                            ) as t 
+                            having 
+                            next_type != type 
+                            and type = 1
+                        ) as t
                     ) as t 
-                    having 
-                    next_type != type 
-                    and type = 1
-                ) as t
-            ) as t 
-            group by 
+                group by 
             user_id, 
             date(created_at)) as in_building_time
         ")

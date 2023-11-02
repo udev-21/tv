@@ -189,9 +189,9 @@
                     }else if (this.sortBy == 'position desc') {
                         return a.position > b.position;
                     }else if (this.sortBy == 'in_building_time') {
-                        return a.in_building_time_show < b.in_building_time_show;
+                        return a.in_building_seconds ?? 0 < b.in_building_seconds ?? 0;
                     }else if (this.sortBy == 'in_building_time desc') {
-                        return a.in_building_time_show > b.in_building_time_show;
+                        return a.in_building_seconds ?? 0 > b.in_building_seconds ?? 0;
                     }else if (this.sortBy == 'phone') {
                         return a.phone < b.phone;
                     }else if (this.sortBy == 'phone desc') {
@@ -230,22 +230,14 @@
                 this.users = this.users.map(m => {
                     m.ago = this.timeAgo(m.updated_at);
                     if (m.active) {
-                        let date = Date.parse(m.updated_at);
-                        let in_building_time = new Date('2021-08-10'+ ' ' + m.in_building_time);
+                        console.log((new Date()).getTime(),   Date.parse(m.updated_at));
+                        let _seconds = (new Date()).getTime() - Date.parse(m.updated_at);
 
-                        let hours = moment.duration(new Date() - date).hours() + in_building_time.getHours();
-                        let minutes = moment.duration(new Date() - date).minutes() + in_building_time.getMinutes();
-                        let seconds = moment.duration(new Date() - date).seconds() + in_building_time.getSeconds();
+                        m.in_building_seconds = _seconds + parseInt(m.in_building_time ?? "0");
+                        const hours = moment.duration(m.in_building_seconds).hours();
+                        const minutes = moment.duration(m.in_building_seconds).minutes();
+                        const seconds = moment.duration(m.in_building_seconds).seconds();
 
-                        if (seconds >= 60) {
-                            minutes += 1;
-                            seconds -= 60;
-                        }
-                        if (minutes >= 60) {
-                            hours += 1;
-                            minutes -= 60;
-                        }
-                        
                         m.in_building_time_show = ''
                         if (hours >= 1) {
                             m.in_building_time_show += hours + ' соат ';
