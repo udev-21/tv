@@ -172,7 +172,7 @@
                 this.sort();
             },
             sort(){
-                console.log(this.sortBy);
+                // console.log(this.sortBy);
                 this.users.sort((a, b) => {
                     if (this.sortBy == 'updated_at' || this.sortBy == 'updated_at desc'){
                         return a.updated_at < b.updated_at;
@@ -196,7 +196,7 @@
                     
                     return a.updated_at < b.updated_at;
                 });
-                console.log(this.users);
+                // console.log(this.users);
             },
             timeAgo(date) {
                 if (typeof date == 'string') {
@@ -296,7 +296,7 @@
                     });
                     this.allUsers = [...this.users];
                     this.sort();
-                    console.log(this.users);
+                    // console.log(this.users);
                 })
                 .catch(error => {
                     console.log(error);
