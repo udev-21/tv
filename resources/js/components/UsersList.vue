@@ -15,6 +15,9 @@
                             <input @click="showAll" checked id="inline-checked-radio" type="radio" value="" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                             <label for="inline-checked-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Hammasi</label>
                         </div>
+                        <div class="flex items-right">
+                            Ishchilar soni: {{ usersCount(this.lastState, this.search)  }}
+                        </div>
                     </div>
                 </div>
                 <label for="table-search" class="sr-only">Search</label>
@@ -30,17 +33,26 @@
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th scope="col" class="px-6 py-3">
-                            FIO
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'name' ? 'name desc' : 'name'); sort();">
+                            FIO {{ this.sortBy == 'name' ? '▲' : (this.sortBy == 'name desc' ? '▼' : '') }}
+                        </th>
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'position' ? 'position desc' : 'position'); sort();">
+                            Lavozimi {{ this.sortBy == 'position' ? '▲' : (this.sortBy == 'position desc' ? '▼' : '') }}
+                        </th>
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'in_building_time' ? 'in_building_time desc' : 'in_building_time'); sort();">
+                            Binoda bo'lgan vaqt {{ this.sortBy == 'in_building_time' ? '▲' : (this.sortBy == 'in_building_time desc' ? '▼' : '') }}
+                        </th>
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'phone' ? 'phone desc' : 'phone'); sort();">
+                            Tel raqami {{ this.sortBy == 'phone' ? '▲' : (this.sortBy == 'phone desc' ? '▼' : '') }}
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Lavozimi
+                            Kelgan vaqti 
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Tel raqami
+                            Ketgan vaqti 
                         </th>
-                        <th scope="col" class="px-6 py-3">
-                            Last action
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'updated_at' ? 'updated_at desc': 'updated_at')">
+                            Last action {{ this.sortBy == 'updated_at' ? '▲' : (this.sortBy == 'updated_at desc' ? '▲' : '') }}
                         </th>
                     </tr>
                 </thead>
@@ -48,9 +60,9 @@
                     <template v-for="user in filteredUsers" :key="user.id">
                         
                         <tr v-show="lastState=='showAll' || (user.active &&  lastState=='showOnlyOnline' ) || (!user.active && lastState=='showOnlyOffline')" :class="`border-b ${(user.active == true) ? 'bg-green-200 hover:bg-green-300' : 'bg-red-200 hover:bg-red-300'}`" >
-                            <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                            <th scope="row" class="flex items-center px-2 py-2 text-gray-900 whitespace-nowrap dark:text-white">
                             <div>
-                                <img @click="imagePreview=true; user.imagePreview=true" class="w-10 h-10 rounded-full hover:opacity-75 hover:border-2" :src="avatarLink(user.avatar)" alt="img">
+                                <img @click="imagePreview=true; user.imagePreview=true" class="w-7 h-7 rounded-full hover:opacity-75 hover:border-2" :src="avatarLink(user.avatar)" alt="img">
                             </div>
                             <div v-show="user.imagePreview" id="popup-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex" aria-modal="true" role="dialog">
                                 <div class="relative w-full max-w-2xl max-h-full">
@@ -64,17 +76,25 @@
                             </div>
                             <div class="pl-3">
                                 <div class="text-base font-semibold">{{ user.name }}</div>
-                                <div class="font-normal text-gray-500">{{ user.email}}</div>
                             </div>
                         </th>
-                        <td class="px-6 py-4">
+                        <td class="px-2 py-2">
                             {{ user.position ? user.position : 'mavjud emas' }}
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-2 py-2">
+                            {{ user.in_building_time_show ? user.in_building_time_show : 'mavjud emas' }}
+                        </td>
+                        <td class="px-2 py-2">
                             {{ user.phone ? user.phone : 'mavjud emas' }}
                         </td>
-                        <td class="px-6 py-4">
-                            {{ user.ago }}
+                        <td class="px-2 py-2">
+                            {{ user.first_in }} <br>
+                        </td>
+                        <td class="px-2 py-2">
+                            {{ !user.active ? user.last_out : 'mavjud emas'  }}
+                        </td>
+                        <td class="px-2 py-2">
+                            {{ user.ago }} <br>
                         </td>
                     </tr>
                 </template>    
@@ -100,13 +120,35 @@
             imagePreview: false,
             pusher: Pusher,
             lastState: 'showAll',
+            sortBy: 'updated_at',
         }),
         computed: {
             filteredUsers() {
                 return this.users.filter(user => {
-                    return user.name.toLowerCase().includes(this.search.toLowerCase());
+                    return user.name.toLowerCase().includes(this.search.toLowerCase()) || user.position?.toLowerCase().includes(this.search.toLowerCase()) || user.phone?.toLowerCase().includes(this.search.toLowerCase());
                 });
             },
+
+            usersCount() {
+                return (lastState, search) => {
+                    let users = [...this.users];
+                    if (search) {
+                        users = this.users.filter(user => {
+                            return user.name.toLowerCase().includes(search.toLowerCase());
+                        });
+                    }
+                    if (lastState == 'showAll') 
+                        return users.length;
+
+                    else if (lastState == 'showOnlyOnline') 
+                        return users.filter(user => user.active).length;
+                    else if (lastState == 'showOnlyOffline') 
+                        return users.filter(user => !user.active).length;
+                    return 0;
+                }
+            }
+
+
         },
         methods: {
             avatarLink(filename) {
@@ -134,7 +176,28 @@
                 this.sort();
             },
             sort(){
+                console.log(this.sortBy);
                 this.users.sort((a, b) => {
+                    if (this.sortBy == 'updated_at' || this.sortBy == 'updated_at desc'){
+                        return a.updated_at < b.updated_at;
+                    }else if (this.sortBy == 'name') {
+                        return a.name > b.name;
+                    }else if (this.sortBy == 'name desc') {
+                        return a.name < b.name;
+                    }else if (this.sortBy == 'position') {
+                        return a.position < b.position;
+                    }else if (this.sortBy == 'position desc') {
+                        return a.position > b.position;
+                    }else if (this.sortBy == 'in_building_time') {
+                        return a.in_building_time_show < b.in_building_time_show;
+                    }else if (this.sortBy == 'in_building_time desc') {
+                        return a.in_building_time_show > b.in_building_time_show;
+                    }else if (this.sortBy == 'phone') {
+                        return a.phone < b.phone;
+                    }else if (this.sortBy == 'phone desc') {
+                        return a.phone > b.phone;
+                    }
+                    
                     return a.updated_at < b.updated_at;
                 });
             },
@@ -142,7 +205,7 @@
             timeAgo(date) {
                 if (typeof date == 'string') {
                     date = Date.parse(date);
-                }                
+                }
                 const days = moment.duration(new Date() - date).days();
                 const hours = moment.duration(new Date() - date).hours();
                 const minutes = moment.duration(new Date() - date).minutes();
@@ -166,6 +229,34 @@
             setInterval(() => {
                 this.users = this.users.map(m => {
                     m.ago = this.timeAgo(m.updated_at);
+                    if (m.active) {
+                        let date = Date.parse(m.updated_at);
+                        let in_building_time = new Date('2021-08-10'+ ' ' + m.in_building_time);
+
+                        let hours = moment.duration(new Date() - date).hours() + in_building_time.getHours();
+                        let minutes = moment.duration(new Date() - date).minutes() + in_building_time.getMinutes();
+                        let seconds = moment.duration(new Date() - date).seconds() + in_building_time.getSeconds();
+
+                        if (seconds >= 60) {
+                            minutes += 1;
+                            seconds -= 60;
+                        }
+                        if (minutes >= 60) {
+                            hours += 1;
+                            minutes -= 60;
+                        }
+                        
+                        m.in_building_time_show = ''
+                        if (hours >= 1) {
+                            m.in_building_time_show += hours + ' соат ';
+                        }
+                        if (minutes >= 1 && hours < 5) {
+                            m.in_building_time_show += minutes + ' дакика ';
+                        }
+                        if (hours < 1 && minutes < 1) {
+                            m.in_building_time_show += seconds + ' сония ';
+                        }
+                    }
                     return m;
                 })
             }, 1000)
@@ -237,6 +328,7 @@
                             userExists.active = false;
                             userExists.updated_at = e.user.updated_at;
                             userExists.ago = this.timeAgo(e.user.updated_at);
+                            userExists.last_out = e.user.updated_at;
                             this.sort();
                         }else {
                             console.log('user does not exist', userExists);

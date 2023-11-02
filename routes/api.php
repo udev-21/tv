@@ -21,6 +21,77 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::get('/users', function () {
-    $users = User::orderBy('updated_at', 'DESC')->get();
-    return response()->json($users);
+    $users = User::select(
+        // '*', 
+        DB::raw("
+            *,
+            (
+                select
+                    created_at
+                from user_logs 
+                where user_id = users.id and type = 1 and date(created_at) = date(now())
+                order by created_at
+                limit 1
+            ) as first_in,
+            (
+                select
+                    created_at
+                from user_logs 
+                where user_id = users.id and type = 0 and date(created_at) = date(now())
+                order by created_at desc
+                limit 1
+            ) as last_out,
+            (select 
+            sec_to_time(
+                sum(
+                time_to_sec(in_building_time)
+                )
+            )
+            FROM 
+            (
+                select 
+                * 
+                FROM 
+                (
+                    select 
+                    id, 
+                    user_id, 
+                    created_at, 
+                    next_created_at, 
+                    next_type, 
+                    type, 
+                    timediff(next_created_at, created_at) as in_building_time 
+                    FROM 
+                    (
+                        select 
+                        *, 
+                        lead(created_at, 1) over(
+                            partition by user_id, 
+                            date(created_at) 
+                            order by 
+                            created_at
+                        ) as next_created_at, 
+                        lead(type, 1) over(
+                            partition by user_id, 
+                            date(created_at) 
+                            order by 
+                            created_at
+                        ) as next_type 
+                        FROM 
+                        user_logs 
+                        where 
+                        user_id = users.id
+                        and date(user_logs.created_at) = date(now())
+                    ) as t 
+                    having 
+                    next_type != type 
+                    and type = 1
+                ) as t
+            ) as t 
+            group by 
+            user_id, 
+            date(created_at)) as in_building_time
+        ")
+    )->orderBy('updated_at', 'DESC');
+    return response()->json($users->get());
 });
