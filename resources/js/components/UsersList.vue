@@ -61,12 +61,12 @@
                         <tr :class="`border-b ${(user.active == true) ? 'bg-green-200 hover:bg-green-300' : 'bg-red-200 hover:bg-red-300'}`" >
                             <th scope="row" class="flex items-center px-2 py-2 text-gray-900 whitespace-nowrap dark:text-white">
                             <div>
-                                <img @click="imagePreview=true; user.imagePreview=true" class="w-7 h-7 rounded-full hover:opacity-75 hover:border-2" :src="avatarLink(user.avatar)" alt="img">
+                                <img @click="imagePreview=true; user.imagePreview=true" class="w-7 h-7 rounded-full hover:opacity-75 hover:border-2" :src="avatarLink(user.avatar, user.name)" alt="img">
                             </div>
                             <div v-show="user.imagePreview" id="popup-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex" aria-modal="true" role="dialog">
                                 <div class="relative w-full max-w-2xl max-h-full">
                                     <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                                        <img :src="avatarLink(user.avatar)" alt="img">
+                                        <img :src="avatarLink(user.avatar, user.name)" alt="img">
                                         <button @click="user.imagePreview=false; imagePreview=false" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                             Close
                                         </button>
@@ -144,9 +144,9 @@
 
         },
         methods: {
-            avatarLink(filename) {
+            avatarLink(filename, name) {
                 if (!filename) {
-                    return 'https://ui-avatars.com/api/?name=' + this.name;
+                    return 'https://ui-avatars.com/api/?name=' + name;
                 }
                 // check if filename is starts with http
                 if (filename.startsWith('http')) {
@@ -271,11 +271,12 @@
                     this.users = response.data.map((user) => {
                         user.imagePreview = false;
                         user.ago = this.timeAgo(user.updated_at);
+                        user.in_building_seconds = parseInt(user.in_building_time)
 
-                        const days = moment.duration(parseInt(user.in_building_time)).days();
-                        const hours = moment.duration(parseInt(user.in_building_time)).hours();
-                        const minutes = moment.duration(parseInt(user.in_building_time)).minutes();
-                        const seconds = moment.duration(parseInt(user.in_building_time)).seconds();
+                        const days = moment.duration(parseInt(user.in_building_seconds)).days();
+                        const hours = moment.duration(parseInt(user.in_building_seconds)).hours();
+                        const minutes = moment.duration(parseInt(user.in_building_seconds)).minutes();
+                        const seconds = moment.duration(parseInt(user.in_building_seconds)).seconds();
 
                         user.in_building_time_show = ''
                         if (days >= 1) {
@@ -290,7 +291,6 @@
                         if (hours < 1 && minutes < 1) {
                             user.in_building_time_show += seconds + ' сония ';
                         }
-                        user.in_building_seconds = parseInt(user.in_building_time)
 
                         return user;
                     });
