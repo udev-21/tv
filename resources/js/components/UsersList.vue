@@ -79,19 +79,19 @@
                             </div>
                         </th>
                         <td class="px-2 py-2">
-                            {{ user.position ? user.position : 'mavjud emas' }}
+                            {{ user.position ? user.position : '-' }}
                         </td>
                         <td class="px-2 py-2">
-                            {{ user.in_building_time_show ? user.in_building_time_show : 'mavjud emas' }}
+                            {{ user.in_building_time_show ? user.in_building_time_show : '-' }}
                         </td>
                         <td class="px-2 py-2">
-                            {{ user.phone ? user.phone : 'mavjud emas' }}
+                            {{ user.phone ? user.phone : '-' }}
                         </td>
                         <td class="px-2 py-2">
                             {{ user.first_in }} <br>
                         </td>
                         <td class="px-2 py-2">
-                            {{ !user.active ? user.last_out : 'mavjud emas'  }}
+                            {{ !user.active ? user.last_out : '-'  }}
                         </td>
                         <td class="px-2 py-2">
                             {{ user.ago }} <br>
