@@ -25,14 +25,21 @@ Route::get('/users', function () {
         // '*', 
         DB::raw("
             *,
-            (
+            ifnull((
                 select
                     created_at
                 from user_logs 
                 where user_id = users.id and type = 1 and date(created_at) = date(now())
                 order by created_at
                 limit 1
-            ) as first_in,
+            ), (
+                select
+                    created_at
+                from user_logs 
+                where user_id = users.id and type = 1
+                order by created_at
+                limit 1
+            ) ) as first_in,
             (
                 select
                     created_at
