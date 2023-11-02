@@ -15,8 +15,8 @@
                             <input @click="showAll" checked id="inline-checked-radio" type="radio" value="" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                             <label for="inline-checked-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Hammasi</label>
                         </div>
-                        <div class="flex items-right">
-                            Ishchilar soni: {{ usersCount(this.lastState, this.search)  }}
+                        <div class="flex items-center">
+                            Xodimlar soni: {{ usersCount(lastState, search)  }}
                         </div>
                     </div>
                 </div>
@@ -27,22 +27,22 @@
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                         </svg>
                     </div>
-                    <input v-model="search" @change="onChangeSearch" type="text" id="table-search-users" class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Qidirish">
+                    <input v-model="search" @input="onChangeSearch" type="text" id="table-search-users" class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Qidirish">
                 </div>
             </div>
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'name' ? 'name desc' : 'name'); sort();">
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'name' ? 'name desc' : 'name'); sortUsers();">
                             FIO {{ this.sortBy == 'name' ? '▲' : (this.sortBy == 'name desc' ? '▼' : '') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'position' ? 'position desc' : 'position'); sort();">
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'position' ? 'position desc' : 'position'); sortUsers();">
                             Lavozimi {{ this.sortBy == 'position' ? '▲' : (this.sortBy == 'position desc' ? '▼' : '') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'in_building_time' ? 'in_building_time desc' : 'in_building_time'); sort();">
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'in_building_time' ? 'in_building_time desc' : 'in_building_time'); sortUsers();">
                             Binoda bo'lgan vaqti {{ this.sortBy == 'in_building_time' ? '▲' : (this.sortBy == 'in_building_time desc' ? '▼' : '') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'phone' ? 'phone desc' : 'phone'); sort();">
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'phone' ? 'phone desc' : 'phone'); sortUsers();">
                             Tel raqami {{ this.sortBy == 'phone' ? '▲' : (this.sortBy == 'phone desc' ? '▼' : '') }}
                         </th>
                         <th scope="col" class="px-6 py-3">
@@ -51,8 +51,8 @@
                         <th scope="col" class="px-6 py-3">
                             Ketgan vaqti 
                         </th>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'updated_at' ? 'updated_at desc': 'updated_at'); sort();">
-                            Oxirgi harakat {{ this.sortBy == 'updated_at' ? '▲' : (this.sortBy == 'updated_at desc' ? '▲' : '') }}
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'updated_at' ? 'updated_at desc': 'updated_at' ); sortUsers();">
+                            Oxirgi harakat {{ this.sortBy == 'updated_at' ? '▲' : (this.sortBy == 'updated_at desc' ? '▼' : '') }}
                         </th>
                     </tr>
                 </thead>
@@ -157,46 +157,47 @@
             showOnlyOnline() {
                 this.lastState = 'showOnlyOnline';
                 this.users = this.allUsers.filter(user => user.active);
-                this.sort();
+                this.sortUsers();
             },
 
             showOnlyOffline() {
                 this.lastState = 'showOnlyOffline';
                 this.users = this.allUsers.filter(user => !user.active);
-                this.sort();
+                this.sortUsers();
             },
 
             showAll() {
                 this.lastState = 'showAll';
                 this.users = [...this.allUsers];
-                this.sort();
+                this.sortUsers();
             },
-            sort(){
+            sortUsers(){
                 // console.log(this.sortBy);
                 this.users.sort((a, b) => {
-                    if (this.sortBy == 'updated_at' || this.sortBy == 'updated_at desc'){
-                        return a.updated_at < b.updated_at;
+                    if (this.sortBy == 'updated_at' ){
+                        return a.updated_at === b.updated_at ? 0 : (a.updated_at < b.updated_at ? 1 : -1);
+                    }else if (this.sortBy == 'updated_at desc'){
+                        return a.updated_at === b.updated_at ? 0 : (a.updated_at > b.updated_at ? 1 : -1);
                     }else if (this.sortBy == 'name') {
-                        return a.name > b.name;
+                        return a.name === b.name ? 0 : (a.name > b.name ? 1 : -1);
                     }else if (this.sortBy == 'name desc') {
-                        return a.name < b.name;
+                        return a.name === b.name ? 0 : (a.name < b.name ? 1 : -1);
                     }else if (this.sortBy == 'position') {
-                        return a.position < b.position;
+                        return a.position === b.position ? 0 : (a.position > b.position ? 1 : -1);
                     }else if (this.sortBy == 'position desc') {
-                        return a.position > b.position;
+                        return a.position === b.position ? 0 : (a.position < b.position ? 1 : -1);
                     }else if (this.sortBy == 'in_building_time') {
-                        return a.in_building_seconds > b.in_building_seconds ;
+                        return a.in_building_seconds === b.in_building_seconds ? 0 : (a.in_building_seconds > b.in_building_seconds ? 1 : -1);
                     }else if (this.sortBy == 'in_building_time desc') {
-                        return a.in_building_seconds < b.in_building_seconds ;
+                        return a.in_building_seconds === b.in_building_seconds ? 0 : (a.in_building_seconds < b.in_building_seconds ? 1 : -1);
                     }else if (this.sortBy == 'phone') {
-                        return a.phone < b.phone;
+                        return a.phone === b.phone ? 0 : (a.phone > b.phone ? 1 : -1);
                     }else if (this.sortBy == 'phone desc') {
-                        return a.phone > b.phone;
+                        return a.phone === b.phone ? 0 : (a.phone < b.phone ? 1 : -1);
                     }
                     
                     return a.updated_at < b.updated_at;
                 });
-                // console.log(this.users);
             },
             timeAgo(date) {
                 if (typeof date == 'string') {
@@ -226,7 +227,7 @@
                 }else {
                     this.users = [...this.allUsers];
                 }
-                this.sort();
+                this.sortUsers();
             }
         },
 
@@ -238,7 +239,7 @@
                     m.ago = this.timeAgo(m.updated_at);
                     if (m.active) {
                         let _seconds = (new Date()).getTime() - Date.parse(m.updated_at);
-
+                        
                         m.in_building_seconds = _seconds + parseInt(m.in_building_time);
 
                         const days = moment.duration(m.in_building_seconds).days();
@@ -271,7 +272,7 @@
                     this.users = response.data.map((user) => {
                         user.imagePreview = false;
                         user.ago = this.timeAgo(user.updated_at);
-                        user.in_building_seconds = parseInt(user.in_building_time)
+                        user.in_building_seconds = parseInt(user.in_building_time);
 
                         const days = moment.duration(parseInt(user.in_building_seconds)).days();
                         const hours = moment.duration(parseInt(user.in_building_seconds)).hours();
@@ -291,12 +292,10 @@
                         if (hours < 1 && minutes < 1) {
                             user.in_building_time_show += seconds + ' сония ';
                         }
-
                         return user;
                     });
                     this.allUsers = [...this.users];
-                    this.sort();
-                    // console.log(this.users);
+                    this.sortUsers();
                 })
                 .catch(error => {
                     console.log(error);
@@ -330,7 +329,7 @@
                             userExists.active = true;
                             userExists.updated_at = e.user.updated_at;
                             userExists.ago = this.timeAgo(e.user.updated_at);
-                            this.sort();
+                            this.sortUsers();
                         }else {
                             console.log('user does not exist', userExists);
                             if (this.lastState == 'showAll' || this.lastState == 'showOnlyOnline') {
@@ -354,7 +353,7 @@
                             userExists.updated_at = e.user.updated_at;
                             userExists.ago = this.timeAgo(e.user.updated_at);
                             userExists.last_out = e.user.updated_at;
-                            this.sort();
+                            this.sortUsers();
                         }else {
                             console.log('user does not exist', userExists);
                             if (this.lastState == 'showAll' || this.lastState == 'showOnlyOffline') {
