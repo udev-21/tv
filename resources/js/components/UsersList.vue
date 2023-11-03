@@ -45,11 +45,11 @@
                         <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'phone' ? 'phone desc' : 'phone'); sortUsers();">
                             Tel raqami {{ this.sortBy == 'phone' ? '▲' : (this.sortBy == 'phone desc' ? '▼' : '') }}
                         </th>
-                        <th scope="col" class="px-6 py-3">
-                            Kelgan vaqti 
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'first_in' ? 'first_in desc' : 'first_in'); sortUsers();">
+                            Kelgan vaqti  {{ this.sortBy == 'first_in' ? '▲' : (this.sortBy == 'first_in desc' ? '▼' : '') }}
                         </th>
-                        <th scope="col" class="px-6 py-3">
-                            Ketgan vaqti 
+                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'last_out' ? 'last_out desc' : 'last_out'); sortUsers();">
+                            Ketgan vaqti  {{ this.sortBy == 'last_out' ? '▲' : (this.sortBy == 'last_out desc' ? '▼' : '') }}
                         </th>
                         <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'updated_at' ? 'updated_at desc': 'updated_at' ); sortUsers();">
                             Oxirgi harakat {{ this.sortBy == 'updated_at' ? '▲' : (this.sortBy == 'updated_at desc' ? '▼' : '') }}
@@ -194,6 +194,14 @@
                         return a.phone === b.phone ? 0 : (a.phone > b.phone ? 1 : -1);
                     }else if (this.sortBy == 'phone desc') {
                         return a.phone === b.phone ? 0 : (a.phone < b.phone ? 1 : -1);
+                    } else if (this.sortBy == 'last_out') {
+                        return Date.parse(a.last_out) === Date.parse(b.last_out) ? 0 : (Date.parse(a.last_out) > Date.parse(b.last_out) ? 1 : -1);
+                    } else if (this.sortBy == 'last_out desc') {
+                        return Date.parse(a.last_out) === Date.parse(b.last_out) ? 0 : (Date.parse(a.last_out) < Date.parse(b.last_out) ? 1 : -1);
+                    }else if (this.sortBy == 'first_in') {
+                        return Date.parse(a.first_in) === Date.parse(b.first_in) ? 0 : (Date.parse(a.first_in) < Date.parse(b.first_in) ? 1 : -1);
+                    }else if (this.sortBy == 'first_in desc') {
+                        return Date.parse(a.first_in) === Date.parse(b.first_in) ? 0 : (Date.parse(a.first_in) > Date.parse(b.first_in) ? 1 : -1);
                     }
                     
                     return a.updated_at < b.updated_at;
@@ -352,7 +360,6 @@
                             userExists.active = false;
                             userExists.updated_at = e.user.updated_at;
                             userExists.ago = this.timeAgo(e.user.updated_at);
-                            userExists.last_out = e.user.updated_at;
                             this.sortUsers();
                         }else {
                             console.log('user does not exist', userExists);

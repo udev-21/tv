@@ -40,14 +40,21 @@ Route::get('/users', function () {
                 order by created_at
                 limit 1
             ) ) as first_in,
-            (
+            ifnull((
                 select
                     created_at
                 from user_logs 
                 where user_id = users.id and type = 0 and date(created_at) = date(now())
                 order by created_at desc
                 limit 1
-            ) as last_out,
+            ), (
+                select
+                    created_at
+                from user_logs 
+                where user_id = users.id and type = 0
+                order by created_at desc
+                limit 1
+            )) as last_out,
             ifnull((
                 select 
                     sum(
