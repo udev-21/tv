@@ -24,6 +24,8 @@ class User extends Authenticatable
         'avatar',
         'active',
         'employee_id',
+        'position_id',
+        'department_id',
         'latin_name',
     ];
 
@@ -47,4 +49,14 @@ class User extends Authenticatable
         'password' => 'hashed',
         'active' => 'boolean',
     ];
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
 }

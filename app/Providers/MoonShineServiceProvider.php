@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\MoonShine\Resources\DepartmentResource;
+use App\MoonShine\Resources\PositionResource;
 use App\MoonShine\Resources\UserLogResource;
 use App\MoonShine\Resources\UserResource;
 use Illuminate\Support\ServiceProvider;
@@ -25,9 +27,16 @@ class MoonShineServiceProvider extends ServiceProvider
                     ->icon('users'),
             ])->translatable(),
 
+            MenuItem::make('Bo\'limlar', new DepartmentResource())
+                ->translatable()
+                ->icon('users'),
+            MenuItem::make('Lavozimlar', new PositionResource())
+                ->translatable()
+                ->icon('users'),
             MenuItem::make('Ishchilar', new UserResource())
                 ->translatable()
                 ->icon('users'),
+            
         ]);
     }
 }

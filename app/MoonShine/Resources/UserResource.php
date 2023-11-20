@@ -7,6 +7,7 @@ use App\Events\EmployeeLeftBuilding;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
+use MoonShine\Fields\BelongsTo;
 use MoonShine\Fields\Email;
 use MoonShine\Fields\Image;
 use MoonShine\Fields\Password;
@@ -30,11 +31,13 @@ class UserResource extends Resource
 		return [
 		    ID::make()->sortable(),
             Image::make('Avatar'),
+            BelongsTo::make('Bo\'lim', 'department', 'name')->required(),
             Text::make('Ishni raqami', 'employee_id')->required(),
-            Text::make('Lavozimi', 'position'),
             Text::make('Name')->required(),
             Text::make('Latin Name')->required(),
             Text::make('Phone'),
+
+            BelongsTo::make('Lavozim', 'position_id', 'name')->required(),
         ];
 	}
 
