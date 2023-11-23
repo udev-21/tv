@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Department;
+use App\Models\Organization;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -111,6 +112,10 @@ Route::get('/users', function () {
     return response()->json($users->get());
 });
 
+Route::get('/organizations', function () {
+    $organizations = Organization::all();
+    return response()->json($organizations);
+});
 Route::get('/departments', function () {
     $departments = Department::all();
     return response()->json($departments);
@@ -212,7 +217,7 @@ Route::get('/departments/{department}/users', function (Department $department) 
     return response()->json($data->get());
 });
 
-Route::get('/departments/{department}/positions/{position}/users', function (int $department, int $position) {
+Route::get('/users/{organization}/{department}/{position}', function (int $organization, int $department, int $position) {
     $data = User::select(
         // '*', 
         DB::raw("
@@ -298,9 +303,15 @@ Route::get('/departments/{department}/positions/{position}/users', function (int
             date(created_at)), 0) * 1000 as in_building_time
         ")
     )->orderBy('updated_at', 'DESC');
+    
+    if ($organization !== 0) {
+        $data->where('organization_id', $organization);
+    }
+    
     if ($department !== 0) {
         $data->where('department_id', $department);
     }
+
     if ($position !== 0) {
         $data->where('position_id', $position);
     }

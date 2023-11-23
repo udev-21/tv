@@ -31,13 +31,14 @@ class UserResource extends Resource
 		return [
 		    ID::make()->sortable(),
             Image::make('Avatar'),
+            BelongsTo::make('Tashkilot', 'organization_id', 'name')->required(),
             BelongsTo::make('Bo\'lim', 'department', 'name')->required(),
+            BelongsTo::make('Lavozim', 'position_id', 'name')->required(),
             Text::make('Ishni raqami', 'employee_id')->required(),
             Text::make('Name')->required(),
-            Text::make('Latin Name')->required(),
+            Text::make('Latin Name')->required()->hideOnIndex(),
             Text::make('Phone'),
 
-            BelongsTo::make('Lavozim', 'position_id', 'name')->required(),
         ];
 	}
 

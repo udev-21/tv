@@ -29,6 +29,14 @@
             </div>
             <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-900">
                 <div class="flex-auto ml-4 items-center">
+                    <label for="departments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tashkilot</label>
+                    <select @change="onOrganizationChange"  id="departments" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <template v-for="_organization in organizations" :key="organizations.id">
+                            <option :selected="_organization.id == department" :value="_organization.id">{{ _organization.name }}</option>
+                        </template>
+                    </select>
+                </div>
+                <div class="flex-auto ml-4 items-center">
                     <label for="departments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bo'lim</label>
                     <select @change="onDepartmentChange"  id="departments" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <template v-for="_department in departments" :key="department.id">
@@ -37,8 +45,8 @@
                     </select>
                 </div>
                 <div class="flex-auto ml-4 items-center">
-                    <label for="departments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Lavozim</label>
-                    <select @change="onPositionChange"  id="departments" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <label for="positions" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Lavozim</label>
+                    <select @change="onPositionChange"  id="positions" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <option selected value="0">Hammasi</option>
                         <template v-for="_position in positions" :key="position.id">
                             <option :value="_position.id">{{ _position.name }}</option>
@@ -138,8 +146,11 @@
             sortBy: 'updated_at',
             departments: [],
             positions: [],
+            organizations: [],
+            
             department: null,
             position: 0,
+            organization: null,
         }),
         computed: {
             usersCount() {
@@ -164,13 +175,16 @@
 
         },
         methods: {
-            onDepartmentChange(e) {
+
+
+
+            onOrganizationChange(e) {
                 this.users = [];
 
-                console.log('selected department', e.target.value);
-                this.department = e.target.value;
+                console.log('selected organization', e.target.value);
+                this.organization = e.target.value;
 
-                axios.get(`/api/departments/${this.department}/positions/${this.position}/users`)
+                axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
                     this.users = response.data.map((user) => {
                         user.imagePreview = false;
@@ -204,38 +218,61 @@
                     console.log(error);
                 });
             },
+
+            calculateUser(user) {
+                user.imagePreview = false;
+                user.ago = this.timeAgo(user.updated_at);
+                user.in_building_seconds = parseInt(user.in_building_time);
+
+                const days = moment.duration(parseInt(user.in_building_seconds)).days();
+                const hours = moment.duration(parseInt(user.in_building_seconds)).hours();
+                const minutes = moment.duration(parseInt(user.in_building_seconds)).minutes();
+                const seconds = moment.duration(parseInt(user.in_building_seconds)).seconds();
+
+                user.in_building_time_show = ''
+                if (days >= 1) {
+                    user.in_building_time_show += days + ' кун ';
+                }
+                if (hours >= 1 && days < 1) {
+                    user.in_building_time_show += hours + ' соат ';
+                }
+                if (minutes >= 1 && hours < 5) {
+                    user.in_building_time_show += minutes + ' дакика ';
+                }
+                if (hours < 1 && minutes < 1) {
+                    user.in_building_time_show += seconds + ' сония ';
+                }
+                return user;
+            },
+
+            onDepartmentChange(e) {
+                this.users = [];
+
+                console.log('selected department', e.target.value);
+                this.department = e.target.value;
+
+                axios.get(`/api/departments/${this.department}/positions/${this.position}/users`)
+                .then(response => {
+                    this.users = response.data.map((user) => {
+                        return this.calculateUser(user)
+                    });
+                    this.allUsers = [...this.users];
+                    this.sortUsers();
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            },
             onPositionChange(e) {
                 this.users = [];
 
                 console.log('selected position', e.target.value);
                 this.position = e.target.value;
 
-                axios.get(`/api/departments/${this.department}/positions/${this.position}/users`)
+                axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
                     this.users = response.data.map((user) => {
-                        user.imagePreview = false;
-                        user.ago = this.timeAgo(user.updated_at);
-                        user.in_building_seconds = parseInt(user.in_building_time);
-
-                        const days = moment.duration(parseInt(user.in_building_seconds)).days();
-                        const hours = moment.duration(parseInt(user.in_building_seconds)).hours();
-                        const minutes = moment.duration(parseInt(user.in_building_seconds)).minutes();
-                        const seconds = moment.duration(parseInt(user.in_building_seconds)).seconds();
-
-                        user.in_building_time_show = ''
-                        if (days >= 1) {
-                            user.in_building_time_show += days + ' кун ';
-                        }
-                        if (hours >= 1 && days < 1) {
-                            user.in_building_time_show += hours + ' соат ';
-                        }
-                        if (minutes >= 1 && hours < 5) {
-                            user.in_building_time_show += minutes + ' дакика ';
-                        }
-                        if (hours < 1 && minutes < 1) {
-                            user.in_building_time_show += seconds + ' сония ';
-                        }
-                        return user;
+                        return this.calculateUser(user);
                     });
                     this.allUsers = [...this.users];
                     this.sortUsers();
@@ -376,54 +413,36 @@
 
         },
         mounted() {
-
             axios.get('/api/positions')
                 .then( response => {
                     this.positions = response.data;
+                });
+
+            axios.get('/api/organizations')
+                .then( response => {
+                    this.organizations = response.data;
+                    this.organization = this.organizations[0].id;
                     axios.get('/api/departments')
                         .then( response => {
                             this.departments = response.data;
                             this.department = this.departments[0].id;
-                            axios.get(`/api/departments/${this.department}/positions/${this.position}/users`)
-                        .then(response => {
-                            this.users = response.data.map((user) => {
-                                user.imagePreview = false;
-                                user.ago = this.timeAgo(user.updated_at);
-                                user.in_building_seconds = parseInt(user.in_building_time);
-
-                                const days = moment.duration(parseInt(user.in_building_seconds)).days();
-                                const hours = moment.duration(parseInt(user.in_building_seconds)).hours();
-                                const minutes = moment.duration(parseInt(user.in_building_seconds)).minutes();
-                                const seconds = moment.duration(parseInt(user.in_building_seconds)).seconds();
-
-                                user.in_building_time_show = ''
-                                if (days >= 1) {
-                                    user.in_building_time_show += days + ' кун ';
-                                }
-                                if (hours >= 1 && days < 1) {
-                                    user.in_building_time_show += hours + ' соат ';
-                                }
-                                if (minutes >= 1 && hours < 5) {
-                                    user.in_building_time_show += minutes + ' дакика ';
-                                }
-                                if (hours < 1 && minutes < 1) {
-                                    user.in_building_time_show += seconds + ' сония ';
-                                }
-                                return user;
-                            });
-                            this.allUsers = [...this.users];
-                            this.sortUsers();
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-
+                            axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
+                                .then(response => {
+                                    this.users = response.data.map((user) => {
+                                        return this.calculateUser(user);
+                                    });
+                                    this.allUsers = [...this.users];
+                                    this.sortUsers();
+                                })
+                                .catch(error => {
+                                    console.log(error);
+                                });    
                         });
                 });
-
             
             
             
+                    
             this.echo = new Echo({
                 broadcaster: 'pusher',
                 key: import.meta.env.VITE_PUSHER_APP_KEY,
