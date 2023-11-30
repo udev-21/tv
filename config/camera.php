@@ -1,11 +1,11 @@
 <?php
 
 return [
-    '192.168.0.134' => [
+    '172.16.0.134' => [
         "entrance" => true,
         "exit" => false,
     ],
-    '192.168.0.135' => [
+    '172,16.0.135' => [
         "entrance" => false,
         "exit" => true,
     ],
