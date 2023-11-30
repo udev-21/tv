@@ -5,7 +5,7 @@ return [
         "entrance" => true,
         "exit" => false,
     ],
-    '172,16.0.135' => [
+    '172.16.0.135' => [
         "entrance" => false,
         "exit" => true,
     ],
