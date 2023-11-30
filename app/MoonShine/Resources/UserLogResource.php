@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\UserLog;
 
 use MoonShine\Fields\BelongsTo;
+use MoonShine\Fields\Date;
 use MoonShine\Fields\SwitchBoolean;
 use MoonShine\Filters\BelongsToFilter;
 use MoonShine\Resources\Resource;
@@ -24,6 +25,7 @@ class UserLogResource extends Resource
 		    ID::make()->sortable(),
             BelongsTo::make('User', 'user')->required(),
             SwitchBoolean::make('Type')->required(),
+            Date::make('Created At')->required(),
         ];
 	}
 
