@@ -31,6 +31,7 @@
                 <div class="flex-auto ml-4 items-center">
                     <label for="organizations" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tashkilot</label>
                     <select @change="onOrganizationChange"  id="organizations" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value="0">Hammasi</option>
                         <template v-for="_organization in organizations" :key="organizations.id">
                             <option :selected="_organization.id == organization" :value="_organization.id">{{ _organization.name }}</option>
                         </template>
@@ -39,6 +40,7 @@
                 <div class="flex-auto ml-4 items-center">
                     <label for="departments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bo'lim</label>
                     <select @change="onDepartmentChange"  id="departments" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value="0">Hammasi</option>
                         <template v-for="_department in departments" :key="department.id">
                             <option :selected="_department.id == department" :value="_department.id">{{ _department.name }}</option>
                         </template>
@@ -184,6 +186,9 @@
                 console.log('selected organization', e.target.value);
                 this.organization = e.target.value;
 
+                // save organization to local storage
+                localStorage.setItem('organization', this.organization);
+
                 axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
                     this.users = response.data.map((user) => {
@@ -251,6 +256,9 @@
                 console.log('selected department', e.target.value);
                 this.department = e.target.value;
 
+                // save department to local storage
+                localStorage.setItem('department', this.department);
+
                 axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
                     this.users = response.data.map((user) => {
@@ -268,6 +276,9 @@
 
                 console.log('selected position', e.target.value);
                 this.position = e.target.value;
+
+                //set position to local storage
+                localStorage.setItem('position', this.position);
 
                 axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
@@ -413,6 +424,21 @@
 
         },
         mounted() {
+            //get department from local storage
+            if (localStorage.getItem('department')) {
+                this.department = localStorage.getItem('department');
+            }
+
+            //get organization from local storage
+            if (localStorage.getItem('organization')) {
+                this.organization = localStorage.getItem('organization');
+            }
+
+            //get position from local storage
+            if (localStorage.getItem('position')) {
+                this.position = localStorage.getItem('position');
+            }
+
             axios.get('/api/positions')
                 .then( response => {
                     this.positions = response.data;
@@ -421,11 +447,13 @@
             axios.get('/api/organizations')
                 .then( response => {
                     this.organizations = response.data;
-                    this.organization = this.organizations[0].id;
+                    if (this.organization == null)
+                        this.organization = this.organizations[0].id;
                     axios.get('/api/departments')
                         .then( response => {
                             this.departments = response.data;
-                            this.department = this.departments[0].id;
+                            if (this.department == null)
+                                this.department = this.departments[0].id;
                             axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                                 .then(response => {
                                     this.users = response.data.map((user) => {
