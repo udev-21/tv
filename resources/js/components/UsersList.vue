@@ -31,7 +31,6 @@
                 <div class="flex-auto ml-4 items-center">
                     <label for="organizations" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tashkilot</label>
                     <select @change="onOrganizationChange"  id="organizations" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option value="0">Hammasi</option>
                         <template v-for="_organization in organizations" :key="organizations.id">
                             <option :selected="_organization.id == organization" :value="_organization.id">{{ _organization.name }}</option>
                         </template>
@@ -49,7 +48,7 @@
                     <label for="positions" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Lavozim</label>
                     <select @change="onPositionChange"  id="positions" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <template v-for="_position in positions" :key="position.id">
-                            <option :value="_position.id">{{ _position.name }}</option>
+                            <option :selected="_position.id ==position" :value="_position.id">{{ _position.name }}</option>
                         </template>
                     </select>
                 </div>
@@ -424,7 +423,7 @@
         mounted() {
             //get department from local storage
             if (localStorage.getItem('department')) {
-                this.department = localStorage.getItem('department');
+                this.department = parseInt(localStorage.getItem('department'));
             }
 
             //get organization from local storage
