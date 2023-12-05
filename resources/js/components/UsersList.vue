@@ -251,7 +251,7 @@
                 console.log('selected department', e.target.value);
                 this.department = e.target.value;
 
-                axios.get(`/api/departments/${this.department}/positions/${this.position}/users`)
+                axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
                     this.users = response.data.map((user) => {
                         return this.calculateUser(user)
