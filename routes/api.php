@@ -114,16 +114,16 @@ Route::get('/users', function () {
 
 Route::get('/organizations', function () {
     $organizations = Organization::all();
-    return response()->json($organizations);
+    return response()->json(array_merge([['id' => 0, 'name' => 'Hammasi']], $organizations->toArray()));
 });
 Route::get('/departments', function () {
     $departments = Department::all();
-    return response()->json($departments);
+    return response()->json(array_merge([['id' => 0, 'name' => 'Hammasi']], $departments->toArray()));
 });
 
 Route::get('/positions', function () {
     $positions = Position::all();
-    return response()->json($positions);
+    return response()->json(array_merge([['id' => 0, 'name' => 'Hammasi']], $positions->toArray()));
 });
 
 Route::get('/departments/{department}/users', function (Department $department) {

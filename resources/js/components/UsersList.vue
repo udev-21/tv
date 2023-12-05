@@ -40,7 +40,6 @@
                 <div class="flex-auto ml-4 items-center">
                     <label for="departments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bo'lim</label>
                     <select @change="onDepartmentChange"  id="departments" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option value="0">Hammasi</option>
                         <template v-for="_department in departments" :key="department.id">
                             <option :selected="_department.id == department" :value="_department.id">{{ _department.name }}</option>
                         </template>
@@ -49,7 +48,6 @@
                 <div class="flex-auto ml-4 items-center">
                     <label for="positions" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Lavozim</label>
                     <select @change="onPositionChange"  id="positions" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected value="0">Hammasi</option>
                         <template v-for="_position in positions" :key="position.id">
                             <option :value="_position.id">{{ _position.name }}</option>
                         </template>
@@ -431,12 +429,12 @@
 
             //get organization from local storage
             if (localStorage.getItem('organization')) {
-                this.organization = localStorage.getItem('organization');
+                this.organization = parseInt(localStorage.getItem('organization'));
             }
 
             //get position from local storage
             if (localStorage.getItem('position')) {
-                this.position = localStorage.getItem('position');
+                this.position = parseInt(localStorage.getItem('position'));
             }
 
             axios.get('/api/positions')
