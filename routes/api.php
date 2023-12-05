@@ -315,6 +315,19 @@ Route::get('/users/{organization}/{department}/{position}', function (int $organ
     if ($position !== 0) {
         $data->where('position_id', $position);
     }
-    return response()->json($data->get());
+
+    $response = $data->get();
+
+    // get distinct departments, organizations and positions from response users
+    $departmentIds = $response->pluck('department_id')->unique();
+    $organizationIds = $response->pluck('organization_id')->unique();
+    $positionIds = $response->pluck('position_id')->unique();
+
+    return response()->json([
+        'users' => $response,
+        'departments' => Department::whereIn('id', $departmentIds)->get()->push(['id' => 0, 'name' => 'Hammasi']),
+        'organizations' => Organization::whereIn('id', $organizationIds)->get()->push(['id' => 0, 'name' => 'Hammasi']),
+        'positions' => Position::whereIn('id', $positionIds)->get()->push(['id' => 0, 'name' => 'Hammasi']),
+    ]);
 });
 

@@ -188,7 +188,10 @@
 
                 axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
-                    this.users = response.data.map((user) => {
+                    this.departments = response.data.departments;
+                    this.positions = response.data.positions;
+                    this.organizations = response.data.organizations;
+                    this.users = response.data.users.map((user) => {
                         user.imagePreview = false;
                         user.ago = this.timeAgo(user.updated_at);
                         user.in_building_seconds = parseInt(user.in_building_time);
@@ -258,7 +261,11 @@
 
                 axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
-                    this.users = response.data.map((user) => {
+
+                    this.departments = response.data.departments;
+                    this.positions = response.data.positions;
+                    this.organizations = response.data.organizations;
+                    this.users = response.data.users.map((user) => {
                         return this.calculateUser(user)
                     });
                     this.allUsers = [...this.users];
@@ -279,7 +286,11 @@
 
                 axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                 .then(response => {
-                    this.users = response.data.map((user) => {
+
+                    this.departments = response.data.departments;
+                    this.positions = response.data.positions;
+                    this.organizations = response.data.organizations;
+                    this.users = response.data.users.map((user) => {
                         return this.calculateUser(user);
                     });
                     this.allUsers = [...this.users];
@@ -453,7 +464,10 @@
                                 this.department = this.departments[0].id;
                             axios.get(`/api/users/${this.organization}/${this.department}/${this.position}`)
                                 .then(response => {
-                                    this.users = response.data.map((user) => {
+                                    this.departments = response.data.departments;
+                                    this.positions = response.data.positions;
+                                    this.organizations = response.data.organizations;
+                                    this.users = response.data.users.map((user) => {
                                         return this.calculateUser(user);
                                     });
                                     this.allUsers = [...this.users];
