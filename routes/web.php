@@ -21,6 +21,10 @@ Route::get('/', function () {
 });
 
 Route::get('/chat', function () {
+    return redirect('/dashboard');
+});
+
+Route::get('/dashboard', function () {
     return view('chat');
 });
 

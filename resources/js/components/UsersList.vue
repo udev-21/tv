@@ -29,10 +29,10 @@
             </div>
             <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-900">
                 <div class="flex-auto ml-4 items-center">
-                    <label for="departments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tashkilot</label>
-                    <select @change="onOrganizationChange"  id="departments" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <label for="organizations" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tashkilot</label>
+                    <select @change="onOrganizationChange"  id="organizations" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <template v-for="_organization in organizations" :key="organizations.id">
-                            <option :selected="_organization.id == department" :value="_organization.id">{{ _organization.name }}</option>
+                            <option :selected="_organization.id == organization" :value="_organization.id">{{ _organization.name }}</option>
                         </template>
                     </select>
                 </div>
