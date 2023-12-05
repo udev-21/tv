@@ -317,17 +317,32 @@ Route::get('/users/{organization}/{department}/{position}', function (int $organ
     }
 
     $response = $data->get();
+    
+    if ($organization !== 0) {
+        $departmentIds = User::where('organization_id', $organization)->get()->pluck('department_id')->unique();
+        $departmentsData = Department::whereIn('id', $departmentIds)->get()->prepend(['id' => 0, 'name' => 'Hammasi']);
+    }
 
-    // get distinct departments, organizations and positions from response users
-    $departmentIds = $response->pluck('department_id')->unique();
-    $organizationIds = $response->pluck('organization_id')->unique();
-    $positionIds = $response->pluck('position_id')->unique();
+    if ($department !== 0) {
+        $qb = User::where('department_id', $department);
+        if ($organization !== 0) {
+            $qb = $qb->where('organization_id', $organization);
+        }
+        $positionIds = $qb->pluck('position_id')->unique();
+
+        $positionsData = Position::whereIn('id', $positionIds)->get()->prepend(['id' => 0, 'name' => 'Hammasi']);
+    }else {
+        if ($organization !== 0) {
+            $positionIds = User::where('organization_id', $organization)->get()->pluck('position_id')->unique();
+            $positionsData = Position::whereIn('id', $positionIds)->get()->prepend(['id' => 0, 'name' => 'Hammasi']);
+        }
+    }
 
     return response()->json([
         'users' => $response,
-        'departments' => Department::whereIn('id', $departmentIds)->get()->push(['id' => 0, 'name' => 'Hammasi']),
-        'organizations' => Organization::whereIn('id', $organizationIds)->get()->push(['id' => 0, 'name' => 'Hammasi']),
-        'positions' => Position::whereIn('id', $positionIds)->get()->push(['id' => 0, 'name' => 'Hammasi']),
+        'departments' => $departmentsData ?? Department::get()->prepend(['id' => 0, 'name' => 'Hammasi']),
+        'organizations' => Organization::get()->prepend(['id' => 0, 'name' => 'Hammasi']),
+        'positions' => $positionsData ?? Position::get()->prepend(['id' => 0, 'name' => 'Hammasi']),
     ]);
 });
 

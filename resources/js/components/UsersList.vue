@@ -59,8 +59,11 @@
                         <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'name' ? 'name desc' : 'name'); sortUsers();">
                             FIO {{ this.sortBy == 'name' ? '▲' : (this.sortBy == 'name desc' ? '▼' : '') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'position' ? 'position desc' : 'position'); sortUsers();">
-                            Lavozimi {{ this.sortBy == 'position' ? '▲' : (this.sortBy == 'position desc' ? '▼' : '') }}
+                        <th scope="col" class="px-6 py-3" 
+                        @click_="this.sortBy = (this.sortBy == 'position' ? 'position desc' : 'position'); sortUsers();"
+                        >
+                            Lavozimi 
+                            <!-- {{ this.sortBy == 'position' ? '▲' : (this.sortBy == 'position desc' ? '▼' : '') }} -->
                         </th>
                         <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'in_building_time' ? 'in_building_time desc' : 'in_building_time'); sortUsers();">
                             Binoda bo'lgan vaqti {{ this.sortBy == 'in_building_time' ? '▲' : (this.sortBy == 'in_building_time desc' ? '▼' : '') }}
@@ -101,7 +104,7 @@
                             </div>
                         </th>
                         <td class="px-2 py-2">
-                            {{ user.position ? user.position : '-' }}
+                            {{ user.position ? user.position.name : '-' }}
                         </td>
                         <td class="px-2 py-2">
                             {{ user.in_building_time_show ? user.in_building_time_show : '-' }}

@@ -30,6 +30,12 @@ class User extends Authenticatable
         'latin_name',
     ];
 
+    protected $with = [
+        'department',
+        'organization',
+        'position',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
