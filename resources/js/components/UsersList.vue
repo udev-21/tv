@@ -113,10 +113,10 @@
                             {{ user.phone ? user.phone : '-' }}
                         </td>
                         <td class="px-2 py-2">
-                            {{ user.first_in }} <br>
+                            {{ dFormat(user.first_in) }} <br>
                         </td>
                         <td class="px-2 py-2">
-                            {{ !user.active ? user.last_out : '-'  }}
+                            {{ !user.active ? dFormat(user.last_out) : '-'  }}
                         </td>
                         <td class="px-2 py-2">
                             {{ user.ago }} <br>
@@ -171,6 +171,12 @@
                     else if (lastState == 'showOnlyOffline') 
                         return users.filter(user => !user.active).length;
                     return 0;
+                }
+            },
+
+            dFormat() {
+                return (date) => {
+                    return moment(date).format('DD.MM.YYYY HH:mm');
                 }
             }
 
