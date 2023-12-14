@@ -49,7 +49,7 @@ class UserResource extends Resource
 
     public function search(): array
     {
-        return ['id', 'name', 'phone'];
+        return ['id', 'name', 'phone', 'employee_id'];
     }
 
     public function filters(): array
