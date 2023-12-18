@@ -77,9 +77,6 @@
                         <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'last_out' ? 'last_out desc' : 'last_out'); sortUsers();">
                             Ketgan vaqti  {{ this.sortBy == 'last_out' ? '▲' : (this.sortBy == 'last_out desc' ? '▼' : '') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 cursor-pointer" @click="this.sortBy = (this.sortBy == 'updated_at' ? 'updated_at desc': 'updated_at' ); sortUsers();">
-                            Oxirgi harakat {{ this.sortBy == 'updated_at' ? '▲' : (this.sortBy == 'updated_at desc' ? '▼' : '') }}
-                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -89,16 +86,7 @@
                             <div>
                                 <img @click="imagePreview=true; user.imagePreview=true" class="w-7 h-7 rounded-full hover:opacity-75 hover:border-2" :src="avatarLink(user.avatar, user.name)" alt="img">
                             </div>
-                            <div v-show="user.imagePreview" id="popup-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex" aria-modal="true" role="dialog">
-                                <div class="relative w-full max-w-2xl max-h-full">
-                                    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                                        <img :src="avatarLink(user.avatar, user.name)" alt="img">
-                                        <button @click="user.imagePreview=false; imagePreview=false" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                            Close
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="pl-3">
                                 <div class="text-base font-semibold">{{ user.name }}</div>
                             </div>
@@ -118,17 +106,11 @@
                         <td class="px-2 py-2">
                             {{ !user.active ? dFormat(user.last_out) : '-'  }}
                         </td>
-                        <td class="px-2 py-2">
-                            {{ user.ago }} <br>
-                        </td>
                     </tr>
                 </template>    
                 </tbody>
             </table>
         </div>
-        
-        
-    <div v-show="imagePreview" modal-backdrop="" class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"></div>
 </template>
 
 <script>
@@ -181,11 +163,10 @@
             }
 
 
+
+
         },
         methods: {
-
-
-
             onOrganizationChange(e) {
                 this.users = [];
 
@@ -202,7 +183,6 @@
                     this.organizations = response.data.organizations;
                     this.users = response.data.users.map((user) => {
                         user.imagePreview = false;
-                        user.ago = this.timeAgo(user.updated_at);
                         user.in_building_seconds = parseInt(user.in_building_time);
 
                         const days = moment.duration(parseInt(user.in_building_seconds)).days();
@@ -235,7 +215,6 @@
 
             calculateUser(user) {
                 user.imagePreview = false;
-                user.ago = this.timeAgo(user.updated_at);
                 user.in_building_seconds = parseInt(user.in_building_time);
 
                 const days = moment.duration(parseInt(user.in_building_seconds)).days();
@@ -372,27 +351,7 @@
                     
                     return a.updated_at < b.updated_at;
                 });
-            },
-            timeAgo(date) {
-                if (typeof date == 'string') {
-                    date = Date.parse(date);
-                }
-                const days = moment.duration(new Date() - date).days();
-                const hours = moment.duration(new Date() - date).hours();
-                const minutes = moment.duration(new Date() - date).minutes();
-                const seconds = moment.duration(new Date() - date).seconds();
-
-                if (days >= 1) {
-                    return days + ' кун';
-                }else if (hours >= 1 && days < 1) {
-                    return hours + ' соат';
-                }else if (minutes >= 1 && hours < 1) {
-                    return minutes + ' дакика';
-                }else {
-                    return seconds + ' сония';
-                }
-            },
-             
+            },             
             onChangeSearch() {
                 if (this.search) {
                     this.users = this.allUsers.filter(user => {
@@ -409,8 +368,8 @@
             console.log(moment.locale('uz'));
             
             setInterval(() => {
-                this.users = this.users.map(m => {
-                    m.ago = this.timeAgo(m.updated_at);
+
+                for (const m of this.users) {
                     if (m.active) {
                         let _seconds = (new Date()).getTime() - Date.parse(m.updated_at);
                         
@@ -435,9 +394,8 @@
                             m.in_building_time_show += seconds + ' сония ';
                         }
                     }
-                    return m;
-                })
-            }, 1000)
+                }
+            }, 60 * 1000)
 
         },
         mounted() {
@@ -518,7 +476,6 @@
                             console.log('user exists', userExists);
                             userExists.active = true;
                             userExists.updated_at = e.user.updated_at;
-                            userExists.ago = this.timeAgo(e.user.updated_at);
                             this.sortUsers();
                         }
                         // else {
@@ -542,7 +499,6 @@
                             console.log('user exists', userExists);
                             userExists.active = false;
                             userExists.updated_at = e.user.updated_at;
-                            userExists.ago = this.timeAgo(e.user.updated_at);
                             this.sortUsers();
                         }
                         // else {

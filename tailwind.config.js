@@ -3,6 +3,7 @@ export default {
   content: [
     "./resources/**/*.blade.php",
     "./node_modules/flowbite/**/*.js",
+    './node_modules/flowbite-vue/**/*.{js,jsx,ts,tsx}',
     "./resources/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {

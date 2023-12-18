@@ -1,78 +1,171 @@
 <template>
-
-<div class="block space-y-4 md:flex md:space-y-0 md:space-x-4">
-    <!-- Modal toggle -->
-    <button :data-modal-target="`extralarge-modal-${user.id}`" :data-modal-toggle="`extralarge-modal-${user.id}`" class="block w-full md:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-    Extra large modal
-    </button>
-</div>
-
-<!-- Extra Large Modal -->
-<div :id="`extralarge-modal-${user.id}`" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-7xl max-h-full">
-        <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <!-- Modal header -->
-            <div class="flex items-center justify-between p-5 border-b rounded-t dark:border-gray-600">
-                <h3 class="text-xl font-medium text-gray-900 dark:text-white">
-                    Extra Large modal
-                </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" :data-modal-hide="`extralarge-modal-${user.id}`">
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                    </svg>
-                    <span class="sr-only">Close modal</span>
-                </button>
-            </div>
-            <!-- Modal body -->
-            <div class="p-6 space-y-6">
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    With less than a month to go before the European Union enacts new consumer privacy laws for its citizens, companies around the world are updating their terms of service agreements to comply.
-                </p>
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant to ensure a common set of data rights in the European Union. It requires organizations to notify users as soon as possible of high-risk data breaches that could personally affect them.
-                </p>
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    With less than a month to go before the European Union enacts new consumer privacy laws for its citizens, companies around the world are updating their terms of service agreements to comply.
-                </p>
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant to ensure a common set of data rights in the European Union. It requires organizations to notify users as soon as possible of high-risk data breaches that could personally affect them.
-                </p>
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    With less than a month to go before the European Union enacts new consumer privacy laws for its citizens, companies around the world are updating their terms of service agreements to comply.
-                </p>
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant to ensure a common set of data rights in the European Union. It requires organizations to notify users as soon as possible of high-risk data breaches that could personally affect them.
-                </p>
-            </div>
-            <!-- Modal footer -->
-            <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                <button :data-modal-hide="`extralarge-modal-${user.id}`" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I accept</button>
-            </div>
+  <fwb-modal v-if="this.user && this.isOpen" v-show="this.isOpen" @close="closeModal" class="min-w-full">
+    <template #header>
+        <div class="flex items-center text-lg">
+            Yo'qlama
         </div>
-    </div>
-</div>
-
-
+    </template>
+    <template #body>
+        {{ user.name ?? "nono" }}
+        <!-- <fwb-checkbox  @click="console.log('changed', isRangePicker)" v-model="isRangePicker" label="Range" /> -->
+        <div class="flex items-center mt-4" >
+            <VueDatePicker 
+                v-model="filteredDate" 
+                range 
+                auto-range="6" 
+                :model-auto=true 
+                :enable-time-picker=false 
+                :auto-apply=true
+                :max-date="new Date()"
+                locale="uz"
+                format="dd.MM.yyyy"
+                @update:model-value="handlePick"
+                ></VueDatePicker>
+        </div>
+        <fwb-accordion flush class="mt-8">
+            <fwb-accordion-panel v-for="day in filteredDays" v-show="filterLogsByDay(day).length > 0">
+                <fwb-accordion-header>{{ extractDay(day) }}</fwb-accordion-header>
+                <fwb-accordion-content>
+                    <fwb-table hoverable>
+                    <fwb-table-body>
+                        <template v-for="log in filterLogsByDay(day)" :key="user.id">
+                            <fwb-table-row
+                                :class="`!text-left !border-b ${(log.type == true) ? '!bg-green-200 hover:!bg-green-300' : '!bg-red-200 hover:!bg-red-300'}`"
+                            >
+                                <fwb-table-cell class="!text-left" >{{ asdf(log.created_at) }}</fwb-table-cell>
+                            </fwb-table-row>
+                        </template>
+                        
+                    </fwb-table-body>
+                </fwb-table>
+                </fwb-accordion-content>
+            </fwb-accordion-panel>
+        </fwb-accordion>
+        <div v-if="this.logs.length == 0" class="m-5 text-center text-lg">
+            Ma'lumot topilmadi
+        </div>
+        
+    </template>
+  </fwb-modal>
 </template>
 
-<script>
+<script >
+import { FwbButton, FwbModal, FwbCheckbox } from 'flowbite-vue'
+
+import {
+    FwbTable,
+    FwbTableBody,
+    FwbTableCell,
+    FwbTableHead,
+    FwbTableHeadCell,
+    FwbTableRow,
+    FwbAccordion,
+    FwbAccordionContent,
+    FwbAccordionHeader,
+    FwbAccordionPanel,
+} from "flowbite-vue";
+
+import moment from 'moment'
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+import { watch, watchSyncEffect } from 'vue';
+
     export default {
-        props: {
-            'user': Object
+        name: "UserDetailsModal",
+        data() {
+            return {
+                isRangePicker: true,
+                filteredDate: null,
+                endDate: moment(),
+                startDate: moment().subtract(6,'d'),
+                logs: [],
+            }
         },
-        created() {
-            axios.get(`/api/users/${this.user.id}`)
-                .then(response => {
-                    console.log(response.data)
-                })
-                .catch(error => {
-                    console.log(error)
-                })
+        props: {
+            'user': Object,
+            'isOpen': Boolean,
+        },
+        mounted() {
+            this.filteredDate = [this.startDate, this.endDate];
+        },
+        components: {
+            FwbButton,
+            FwbModal,
+            FwbCheckbox,
+            VueDatePicker,
+            FwbTable,
+            FwbTableBody,
+            FwbTableCell,
+            FwbTableHead,
+            FwbTableHeadCell,
+            FwbTableRow,
+            FwbAccordion,
+            FwbAccordionContent,
+            FwbAccordionHeader,
+            FwbAccordionPanel,
         },
 
-        mounted() {
-            console.log('mounted')
+        methods: {
+            closeModal() {
+                this.$emit('close')
+            },
+
+            handleSearch() {
+                const from = moment(this.startDate).format('YYYY-MM-DD')
+                const to = moment(this.endDate).format('YYYY-MM-DD')
+                this.getLogs(from, to);
+            },
+
+            getLogs(from, to){
+                axios.get(`/api/logs/users/${this.user.id}/${from}/${to}`)
+                    .then((response) => {
+                        console.log(response.data);
+                        this.logs = response.data;
+                    })
+            },
+
+            handlePick(data) {
+                this.filteredDate = data;
+                this.startDate = this.filteredDate[0];
+                this.endDate = this.filteredDate[1];
+                this.handleSearch();
+            }
         },
+        computed: {
+            asdf() {
+                return (date) => moment(date).format('DD.MM.YYYY HH:mm:ss');
+            },
+
+            extractDay() {
+                return (date) => moment(date).format('DD.MM.YYYY');
+            },
+
+            filteredDays() {
+                return [
+                    moment(this.endDate),
+                    moment(this.endDate).subtract(1, 'd'),
+                    moment(this.endDate).subtract(2, 'd'),
+                    moment(this.endDate).subtract(3, 'd'),
+                    moment(this.endDate).subtract(4, 'd'),
+                    moment(this.endDate).subtract(5, 'd'),
+                    moment(this.endDate).subtract(6, 'd'),
+                ]
+            },
+
+            filterLogsByDay() {
+                return (day) => this.logs.filter( e => {
+                    return moment(Date.parse(day)).isSame(Date.parse(e.created_at), 'day')
+                })
+            }
+        },
+        watch:{
+            'user': function() {
+                const from = moment(this.startDate).format('YYYY-MM-DD')
+                const to = moment(this.endDate).format('YYYY-MM-DD')
+
+                this.getLogs(from, to);
+            }
+        }
     }
+
 </script>

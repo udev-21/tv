@@ -9,8 +9,11 @@
     @vite('resources/js/app.js')
 </head>
 <body>
-    <div id="app" class="2xl:container mx-auto px-4 mt-4">
-        <users-list ></users-list>
+    <div id="app" class="2xl:container mx-auto px-4 mt-4 max-w-screen-2xl">
+        {{-- <users-list ></users-list> --}}
+        <Home></Home>
+
     </div>
+
 </body>
 </html>

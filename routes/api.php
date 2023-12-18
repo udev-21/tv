@@ -229,14 +229,17 @@ Route::get('/users/{organization}/{department}/{position}', function (int $organ
                 where user_id = users.id and type = 1 and date(created_at) = date(now())
                 order by created_at
                 limit 1
-            ), (
+            ), '-' ) as first_in,
+            
+            ifnull((
                 select
-                    created_at
-                from user_logs 
-                where user_id = users.id and type = 1
-                order by created_at
+                    if(type = 1, true, false)
+                from user_logs
+                where user_id = users.id and date(created_at) = date(now())
+                order by created_at desc
                 limit 1
-            ) ) as first_in,
+            ), false ) as active,
+            
             ifnull((
                 select
                     created_at
@@ -244,14 +247,7 @@ Route::get('/users/{organization}/{department}/{position}', function (int $organ
                 where user_id = users.id and type = 0 and date(created_at) = date(now())
                 order by created_at desc
                 limit 1
-            ), (
-                select
-                    created_at
-                from user_logs 
-                where user_id = users.id and type = 0
-                order by created_at desc
-                limit 1
-            )) as last_out,
+            ), '-') as last_out,
             ifnull((
                 select 
                     sum(
@@ -298,9 +294,7 @@ Route::get('/users/{organization}/{department}/{position}', function (int $organ
                             and type = 1
                         ) as t
                     ) as t 
-                group by 
-            user_id, 
-            date(created_at)), 0) * 1000 as in_building_time
+                group by user_id, date(created_at)), 0) * 1000 as in_building_time
         ")
     )->orderBy('updated_at', 'DESC');
     
@@ -346,3 +340,10 @@ Route::get('/users/{organization}/{department}/{position}', function (int $organ
     ]);
 });
 
+
+
+Route::get('/logs/users/{user}/{from}/{to}', function(User $user, $from, $to) {
+    $logs = $user->logs()->whereBetween(DB::raw('DATE(created_at)'), [$from, $to]);
+    // dd($logs->toRawSql());
+    return response()->json($logs->get(['id','type', 'created_at']));
+})->whereNumber('user')->where('from', '\d{4}-\d{2}-\d{2}')->where('to', '\d{4}-\d{2}-\d{2}');
