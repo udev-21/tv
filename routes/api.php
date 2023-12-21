@@ -218,85 +218,7 @@ Route::get('/departments/{department}/users', function (Department $department) 
 });
 
 Route::get('/users/{organization}/{department}/{position}', function (int $organization, int $department, int $position) {
-    $data = User::select(
-        // '*', 
-        DB::raw("
-            *,
-            ifnull((
-                select
-                    created_at
-                from user_logs 
-                where user_id = users.id and type = 1 and date(created_at) = date(now())
-                order by created_at
-                limit 1
-            ), '-' ) as first_in,
-            
-            ifnull((
-                select
-                    if(type = 1, true, false)
-                from user_logs
-                where user_id = users.id and date(created_at) = date(now())
-                order by created_at desc
-                limit 1
-            ), false ) as active,
-            
-            ifnull((
-                select
-                    created_at
-                from user_logs 
-                where user_id = users.id and type = 0 and date(created_at) = date(now())
-                order by created_at desc
-                limit 1
-            ), '-') as last_out,
-            ifnull((
-                select 
-                    sum(
-                        time_to_sec(in_building_time)
-                    )
-                FROM 
-                    (
-                        select 
-                        * 
-                        FROM 
-                        (
-                            select 
-                            id, 
-                            user_id, 
-                            created_at, 
-                            next_created_at, 
-                            next_type, 
-                            type, 
-                            timediff(next_created_at, created_at) as in_building_time 
-                            FROM 
-                            (
-                                select 
-                                *, 
-                                lead(created_at, 1) over(
-                                    partition by user_id, 
-                                    date(created_at) 
-                                    order by 
-                                    created_at
-                                ) as next_created_at, 
-                                lead(type, 1) over(
-                                    partition by user_id, 
-                                    date(created_at) 
-                                    order by 
-                                    created_at
-                                ) as next_type 
-                                FROM 
-                                user_logs 
-                                where 
-                                user_id = users.id
-                                and date(user_logs.created_at) = date(now())
-                            ) as t 
-                            having 
-                            next_type != type 
-                            and type = 1
-                        ) as t
-                    ) as t 
-                group by user_id, date(created_at)), 0) * 1000 as in_building_time
-        ")
-    )->orderBy('updated_at', 'DESC');
+    $data = User::orderBy('updated_at', 'DESC');
     
     if ($organization !== 0) {
         $data->where('organization_id', $organization);
@@ -343,7 +265,7 @@ Route::get('/users/{organization}/{department}/{position}', function (int $organ
 
 
 Route::get('/logs/users/{user}/{from}/{to}', function(User $user, $from, $to) {
-    $logs = $user->logs()->whereBetween(DB::raw('DATE(created_at)'), [$from, $to]);
+    $logs = $user->logs()->whereBetween(DB::raw('DATE(created_at)'), [$from, $to])->orderBy('created_at', 'DESC');
     // dd($logs->toRawSql());
     return response()->json($logs->get(['id','type', 'created_at']));
 })->whereNumber('user')->where('from', '\d{4}-\d{2}-\d{2}')->where('to', '\d{4}-\d{2}-\d{2}');

@@ -176,6 +176,14 @@ export default {
                     this.positions = response.data.positions;
                     this.organizations = response.data.organizations;
                     this.users = response.data.users.map((user) => {
+                        if (user.todays_sessions.length > 0) {
+                            user.first_in = user.latest_session ? user.latest_session.in : '-';
+                            user.last_out = user.active ? '-' : user.latest_session ? user.latest_session.out : '-';
+                        }else {
+                            user.first_in = '-';
+                            user.last_out = '-';
+                        }
+
                         user.imagePreview = false;
                         user.in_building_seconds = parseInt(user.in_building_time);
 
@@ -207,29 +215,39 @@ export default {
                 });
             },
 
-            calculateUser(user) {
-                user.imagePreview = false;
-                user.in_building_seconds = parseInt(user.in_building_time);
+            calculateUser(m) {
+                let _seconds = 0;
+                
+                if (m.last_in == '-'){
+                    m.in_building_seconds = 0;
+                    m.in_building_time_show = '-';
+                    return m;
+                }
 
-                const days = moment.duration(parseInt(user.in_building_seconds)).days();
-                const hours = moment.duration(parseInt(user.in_building_seconds)).hours();
-                const minutes = moment.duration(parseInt(user.in_building_seconds)).minutes();
-                const seconds = moment.duration(parseInt(user.in_building_seconds)).seconds();
+                _seconds = (new Date()).getTime() - Date.parse(m.last_in);
+                
+                m.in_building_seconds = _seconds + parseInt(m.in_building_time);
 
-                user.in_building_time_show = ''
+                const days = moment.duration(m.in_building_seconds).days();
+                const hours = moment.duration(m.in_building_seconds).hours();
+                const minutes = moment.duration(m.in_building_seconds).minutes();
+                const seconds = moment.duration(m.in_building_seconds).seconds();
+
+                m.in_building_time_show = ''
                 if (days >= 1) {
-                    user.in_building_time_show += days + ' кун ';
+                    m.in_building_time_show += days + ' кун ';
+                }else {
+                    if (hours >= 1) {
+                        m.in_building_time_show += hours + ' соат ';
+                    }
+                    if (minutes >= 1 && hours < 5 && days < 1) {
+                        m.in_building_time_show += minutes + ' дакика ';
+                    }
+                    if (hours < 1 && minutes < 1 && days < 1) {
+                        m.in_building_time_show += seconds + ' сония ';
+                    }
                 }
-                if (hours >= 1 && days < 1) {
-                    user.in_building_time_show += hours + ' соат ';
-                }
-                if (minutes >= 1 && hours < 5) {
-                    user.in_building_time_show += minutes + ' дакика ';
-                }
-                if (hours < 1 && minutes < 1) {
-                    user.in_building_time_show += seconds + ' сония ';
-                }
-                return user;
+                return m;
             },
 
             onDepartmentChange(e) {
@@ -250,6 +268,15 @@ export default {
                     this.positions = response.data.positions;
                     this.organizations = response.data.organizations;
                     this.users = response.data.users.map((user) => {
+                        if (user.todays_sessions.length > 0) {
+                            user.first_in = user.latest_session ? user.latest_session.in : '-';
+                            user.last_out = user.active ? '-' : user.latest_session ? user.latest_session.out : '-';
+                        }else {
+                            user.first_in = '-';
+                            user.last_out = '-';
+                        }
+                        
+
                         return this.calculateUser(user)
                     });
                     this.allUsers = [...this.users];
@@ -275,6 +302,13 @@ export default {
                     this.positions = response.data.positions;
                     this.organizations = response.data.organizations;
                     this.users = response.data.users.map((user) => {
+                        if (user.todays_sessions.length > 0) {
+                            user.first_in = user.latest_session ? user.latest_session.in : '-';
+                            user.last_out = user.active ? '-' : user.latest_session ? user.latest_session.out : '-';
+                        }else {
+                            user.first_in = '-';
+                            user.last_out = '-';
+                        }
                         return this.calculateUser(user);
                     });
                     this.allUsers = [...this.users];
@@ -375,6 +409,15 @@ export default {
         if (localStorage.getItem("position")) {
             this.position = parseInt(localStorage.getItem("position"));
         }
+
+        setInterval(() => { 
+
+            for (const m of this.users) {
+                if (m.active) {
+                    this.calculateUser(m);
+                }
+            }
+        }, 5 * 1000)
     },
 
     created() {
@@ -399,6 +442,19 @@ export default {
                         this.positions = response.data.positions;
                         this.organizations = response.data.organizations;
                         this.users = response.data.users.map((user) => {
+                            if (user.todays_sessions.length > 0) {
+                                user.first_in = user.todays_sessions[user.todays_sessions.length - 1].in;
+                                user.last_out = user.active ? '-' : user.latest_session ? user.latest_session.out : '-';
+                            }else {
+                                if (user.latest_session) {
+                                    user.first_in = user.latest_session.in;
+                                    user.last_out = user.latest_session.out;
+                                }else {
+                                    user.first_in = '-';
+                                    user.last_out = '-';
+                                }
+                            }
+
                             return this.calculateUser(user);
                         });
                         this.allUsers = [...this.users];
@@ -460,6 +516,7 @@ export default {
                             console.log('user exists', userExists);
                             userExists.active = false;
                             userExists.updated_at = e.user.updated_at;
+                            userExists.last_out = e.user.last_out;
                             this.sortUsers();
                         }
                         // else {

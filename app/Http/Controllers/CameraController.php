@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\EmployeeEnteredBuilding;
 use App\Events\EmployeeLeftBuilding;
 use App\Helpers\CrylicToLatin;
+use App\Models\Session;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -52,16 +53,35 @@ class CameraController extends Controller
 
                     $camera = $whitelist[$ip];
                     if ($camera['entrance']) {
-                        $user->active = true;
-                        $user->save();
+                        $notFinishedOldSession = Session::where('user_id', $user->id)->whereNull('out')->first();
+
+                        if($notFinishedOldSession){
+                            $notFinishedOldSession->out = now();
+                            $notFinishedOldSession->save();
+                        }
+
+                        Session::create([
+                            'user_id' => $user->id,
+                            'in' => now(),
+                        ]);
+
+                        $user->refresh();
+
                         EmployeeEnteredBuilding::dispatch($user);
                         return response()->json([
                             'status' => 'success',
                             'message' => "User $name with employee id $employee_id entered the building",
                         ], 200);
                     }else if ($camera['exit']) {
-                        $user->active = false;
-                        $user->save();
+
+                        $notFinishedOldSession = Session::where('user_id', $user->id)->whereNull('out')->first();
+                        if($notFinishedOldSession){
+                            $notFinishedOldSession->out = now();
+                            $notFinishedOldSession->save();
+                        }
+
+                        $user->refresh();
+                        
                         EmployeeLeftBuilding::dispatch($user);
                         return response()->json([
                             'status' => 'success',

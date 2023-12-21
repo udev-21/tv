@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\MoonShine\Resources\DepartmentResource;
 use App\MoonShine\Resources\OrganizationResource;
 use App\MoonShine\Resources\PositionResource;
+use App\MoonShine\Resources\SessionResource;
 use App\MoonShine\Resources\UserLogResource;
 use App\MoonShine\Resources\UserResource;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +25,9 @@ class MoonShineServiceProvider extends ServiceProvider
                     ->translatable()
                     ->icon('users'),
                 MenuItem::make('User Logs', new UserLogResource())
+                    ->translatable()
+                    ->icon('users'),
+                MenuItem::make('User Sessions', new SessionResource())
                     ->translatable()
                     ->icon('users'),
             ])->translatable(),

@@ -367,7 +367,7 @@
         created() {
             console.log(moment.locale('uz'));
             
-            setInterval(() => {
+            setInterval(() => { 
 
                 for (const m of this.users) {
                     if (m.active) {

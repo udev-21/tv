@@ -11,7 +11,10 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-
+/**
+ * Class EmployeeEnteredBuilding
+ * @property User $user
+ */
 class EmployeeEnteredBuilding implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;

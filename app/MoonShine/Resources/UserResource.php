@@ -4,6 +4,7 @@ namespace App\MoonShine\Resources;
 
 use App\Events\EmployeeEnteredBuilding;
 use App\Events\EmployeeLeftBuilding;
+use App\Models\Session;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
@@ -68,13 +69,27 @@ class UserResource extends Resource
     public function itemActions(): array 
     {
         return [
-            ItemAction::make('Chiqib ketti', function (User $item) {
-                $item->update(['active' => false]);
-                EmployeeLeftBuilding::dispatch($item);
+            ItemAction::make('Chiqib ketti', function (User $user) {
+                $notFinishedOldSession = Session::where('user_id', $user->id)->whereNull('out')->first();
+                if($notFinishedOldSession){
+                    $notFinishedOldSession->out = now();
+                    $notFinishedOldSession->save();
+                }
+                $user->refresh();
+                EmployeeLeftBuilding::dispatch($user);
             }, 'Left'),
-            ItemAction::make('Kirib keldi', function (User $item) {
-                $item->update(['active' => true]);
-                EmployeeEnteredBuilding::dispatch($item);
+            ItemAction::make('Kirib keldi', function (User $user) {
+                $notFinishedOldSession = Session::where('user_id', $user->id)->whereNull('out')->first();
+                if($notFinishedOldSession){
+                    $notFinishedOldSession->out = now();
+                    $notFinishedOldSession->save();
+                }
+                Session::create([
+                    'user_id' => $user->id,
+                    'in' => now(),
+                ]);
+                $user->refresh();
+                EmployeeEnteredBuilding::dispatch($user);
             }, 'Entered'),
             
         ];

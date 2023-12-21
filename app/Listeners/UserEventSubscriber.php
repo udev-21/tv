@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\EmployeeLeftBuilding;
 use App\Events\EmployeeEnteredBuilding;
 use App\Models\UserLog;
+use App\Models\Session;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Log;
  
@@ -18,6 +19,7 @@ class UserEventSubscriber
             'user_id' => $event->user->id,
             'type' => true,
         ]);
+        
     }
  
     /**
