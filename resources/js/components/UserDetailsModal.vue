@@ -6,7 +6,8 @@
         </div>
     </template>
     <template #body>
-        {{ user.name ?? "nono" }}
+        <h3 class="text-xl"> {{ user.name ?? "nono" }} </h3>
+        
         <fwb-img
             alt="Rasm yo'q"
             size="max-h-52"
