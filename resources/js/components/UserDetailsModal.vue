@@ -7,6 +7,11 @@
     </template>
     <template #body>
         {{ user.name ?? "nono" }}
+        <fwb-img
+            alt="Rasm yo'q"
+            size="max-h-52"
+            :src="`/storage/${user.avatar}`"
+        />
         <!-- <fwb-checkbox  @click="console.log('changed', isRangePicker)" v-model="isRangePicker" label="Range" /> -->
         <div class="flex items-center mt-4" >
             <VueDatePicker 
@@ -70,6 +75,7 @@ import {
     FwbAccordionContent,
     FwbAccordionHeader,
     FwbAccordionPanel,
+    FwbImg,
 } from "flowbite-vue";
 
 import moment from 'moment'
@@ -110,6 +116,7 @@ import { watch, watchSyncEffect } from 'vue';
             FwbAccordionContent,
             FwbAccordionHeader,
             FwbAccordionPanel,
+            FwbImg,
         },
 
         methods: {
