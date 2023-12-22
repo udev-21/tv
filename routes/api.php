@@ -5,6 +5,7 @@ use App\Models\Organization;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -268,4 +269,17 @@ Route::get('/logs/users/{user}/{from}/{to}', function(User $user, $from, $to) {
     $logs = $user->logs()->whereBetween(DB::raw('DATE(created_at)'), [$from, $to])->orderBy('created_at', 'DESC');
     // dd($logs->toRawSql());
     return response()->json($logs->get(['id','type', 'created_at']));
+})->whereNumber('user')->where('from', '\d{4}-\d{2}-\d{2}')->where('to', '\d{4}-\d{2}-\d{2}');
+
+
+Route::get('/sessions/users/{user}/{from}/{to}', function(User $user, $from, $to) {
+    $sessions = $user->sessions()
+        ->where(function($query) use ($from, $to) {
+            $query->orWhereBetween(DB::raw('date(`in`)'), [$from, $to])
+            ->orWhereBetween(DB::raw('date(`out`)'), [$from, $to])
+            ->orWhereNull('out');
+        })
+        ->orderBy('created_at', 'DESC');
+    // dd($sessions->toRawSql());
+    return response()->json($sessions->get(['id','in','out']));
 })->whereNumber('user')->where('from', '\d{4}-\d{2}-\d{2}')->where('to', '\d{4}-\d{2}-\d{2}');
