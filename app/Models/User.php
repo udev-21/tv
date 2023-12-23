@@ -30,6 +30,7 @@ class User extends Authenticatable
         'department_id',
         'organization_id',
         'latin_name',
+        'can_see_guard',
     ];
 
     protected $with = [
@@ -60,6 +61,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'active' => 'boolean',
+        'can_see_guard' => 'boolean',
     ];
 
     protected $appends = [

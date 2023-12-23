@@ -14,6 +14,8 @@ class PositionResource extends Resource
 {
 	public static string $model = Position::class;
 
+    public static bool $withPolicy = true; 
+
 	public static string $title = 'Positions';
 
 	public function fields(): array

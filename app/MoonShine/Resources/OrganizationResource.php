@@ -14,6 +14,7 @@ class OrganizationResource extends Resource
 {
 	public static string $model = Organization::class;
 
+    public static bool $withPolicy = true; 
 	public static string $title = 'Organizations';
 
 	public function fields(): array

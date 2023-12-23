@@ -14,6 +14,7 @@ class DepartmentResource extends Resource
 {
 	public static string $model = Department::class;
 
+    public static bool $withPolicy = true; 
 	public static string $title = "Bo'limlar";
 
 	public function fields(): array

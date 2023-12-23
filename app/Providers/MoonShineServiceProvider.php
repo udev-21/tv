@@ -12,6 +12,7 @@ use Illuminate\Support\ServiceProvider;
 use MoonShine\MoonShine;
 use MoonShine\Menu\MenuGroup;
 use MoonShine\Menu\MenuItem;
+use MoonShine\MoonShineRequest;
 use MoonShine\Resources\MoonShineUserResource;
 use MoonShine\Resources\MoonShineUserRoleResource;
 
@@ -30,17 +31,28 @@ class MoonShineServiceProvider extends ServiceProvider
                 MenuItem::make('User Sessions', new SessionResource())
                     ->translatable()
                     ->icon('users'),
-            ])->translatable(),
+            ])->translatable()->canSee(function(MoonShineRequest $req){
+                return $req->user()->moonshineUserRole->name == 'Admin';
+            }),
 
             MenuItem::make('Tashkilotlar', new OrganizationResource())
                 ->translatable()
-                ->icon('users'),
+                ->icon('users')
+                ->canSee(function(MoonShineRequest $req){
+                    return $req->user()->moonshineUserRole->name == 'Admin';
+                }),
             MenuItem::make('Bo\'limlar', new DepartmentResource())
                 ->translatable()
-                ->icon('users'),
+                ->icon('users')
+                ->canSee(function(MoonShineRequest $req){
+                    return $req->user()->moonshineUserRole->name == 'Admin';
+                }),
             MenuItem::make('Lavozimlar', new PositionResource())
                 ->translatable()
-                ->icon('users'),
+                ->icon('users')
+                ->canSee(function(MoonShineRequest $req){
+                    return $req->user()->moonshineUserRole->name == 'Admin';
+                }),
             MenuItem::make('Ishchilar', new UserResource())
                 ->translatable()
                 ->icon('users'),

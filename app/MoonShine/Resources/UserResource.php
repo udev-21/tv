@@ -16,17 +16,17 @@ use MoonShine\Fields\SwitchBoolean;
 use MoonShine\Fields\Text;
 use MoonShine\Filters\SwitchBooleanFilter;
 use MoonShine\ItemActions\ItemAction;
+use MoonShine\MoonShineRequest;
 use MoonShine\Resources\Resource;
 use MoonShine\Fields\ID;
 use Illuminate\Contracts\Database\Eloquent\Builder; 
 use MoonShine\Actions\FiltersAction;
-
 class UserResource extends Resource
 {
 	public static string $model = User::class;
 
 	public static string $title = 'Users';
-
+    public static bool $withPolicy = true; 
 	public function fields(): array
 	{
 		return [
@@ -39,6 +39,9 @@ class UserResource extends Resource
             Text::make('Name')->required(),
             Text::make('Latin Name')->required()->hideOnIndex(),
             Text::make('Phone'),
+            SwitchBoolean::make('Can See Guard')->required()->default(false)->canSee(function(...$req) {
+                return request()->user()->moonshineUserRole->name == 'Admin';
+            })->hideOnIndex(),
 
         ];
 	}
@@ -107,7 +110,15 @@ class UserResource extends Resource
 
     public function query(): Builder 
     {
-        return parent::query()
-            ->orderBy('updated_at', 'desc');
+        
+        if (request()->user()->moonshineUserRole->name == 'Guard') {
+            return parent::query()
+                ->whereIn('id', User::select('id')->where('can_see_guard', true)->pluck('id')->toArray())
+                ->orderBy('updated_at', 'desc');
+        }else if (request()->user()->moonshineUserRole->name == 'Admin') {
+            return parent::query()
+                ->orderBy('updated_at', 'desc');
+        }
+        return parent::query()->where(false);
     } 
 }
